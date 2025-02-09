@@ -51,7 +51,7 @@ st.title('Análisis de Riesgo Cardiovascular')
 st.write("### Vista previa de los datos")
 st.dataframe(data.head())
 st.write("### Información de los datos")
-st.dataframe(data.info())
+st.dataframe(data.describe())
 
 # Distribución de la variable objetivo
 st.write("#### Distribución de la Variable Objetivo")
