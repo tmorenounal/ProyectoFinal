@@ -53,8 +53,15 @@ st.dataframe(data.head())
 st.write("### Información de los datos")
 st.dataframe(data.describe())
 
+st.write("### Distribución de Todas las Variables Numéricas")
 
-# Histogramas de las variables numéricas
+for col in numerical_columns:
+    fig, ax = plt.subplots()
+    sns.histplot(data[col], bins=30, kde=True, ax=ax)
+    ax.set_title(f'Distribución de {col}')
+    ax.set_xlabel(col)
+    ax.set_ylabel('Frecuencia')
+    st.pyplot(fig)
 
 
 # Distribución de la variable objetivo
