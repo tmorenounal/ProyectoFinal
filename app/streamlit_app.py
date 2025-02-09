@@ -52,7 +52,7 @@ data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.item
 data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
 
 # Definir un umbral fijo para clasificación (ajústalo según necesidad)
-umbral_fijo = 50  # Cambia este valor según el criterio médico o estadístico
+umbral_fijo = 0.5  # Cambia este valor según el criterio médico o estadístico
 
 # Crear la variable binaria basada en el umbral fijo
 data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > umbral_fijo).astype(int)
