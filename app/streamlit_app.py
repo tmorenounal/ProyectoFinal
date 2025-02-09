@@ -48,18 +48,17 @@ data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > data['R
 # Calcular el índice de riesgo cardiovascular
 data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
 
-# Permitir al usuario elegir un umbral para clasificar el riesgo
-st.write("### Configuración del Umbral de Clasificación")
-umbral = st.slider("Selecciona el umbral de riesgo cardiovascular:", 
-                   float(data['Riesgo_Cardiovascular'].min()), 
-                   float(data['Riesgo_Cardiovascular'].max()), 
-                   float(data['Riesgo_Cardiovascular'].median()))
+# Calcular el índice de riesgo cardiovascular
+data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
 
-# Crear la variable binaria basada en el umbral seleccionado
-data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > umbral).astype(int)
+# Definir un umbral fijo para clasificación (ajústalo según necesidad)
+umbral_fijo = 50  # Cambia este valor según el criterio médico o estadístico
+
+# Crear la variable binaria basada en el umbral fijo
+data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > umbral_fijo).astype(int)
 
 # Mostrar información del umbral seleccionado
-st.write(f"Se ha seleccionado un umbral de **{umbral:.2f}** para clasificar el riesgo cardiovascular.")
+st.write(f"Se ha utilizado un umbral fijo de **{umbral_fijo}** para clasificar el riesgo cardiovascular.")
 
 # Mostrar distribución después de aplicar el umbral
 st.write("#### Distribución de la Variable Objetivo")
