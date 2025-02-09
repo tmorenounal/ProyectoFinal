@@ -97,13 +97,10 @@ La variable objetivo de este estudio es el **Riesgo Cardiovascular**, que se det
 - **Colesterol Total (CTOTAL)**: Alto riesgo si **CTOTAL > 200 mg/dL**.
 - **Triglicéridos (Triglic)**: Alto riesgo si **Triglic > 150 mg/dL**.
 - **Colesterol LDL (CLDL)**: Alto riesgo si **CLDL > 130 mg/dL**.
-- **Colesterol HDL (CHDL)**:
-  - **Bajo riesgo** si **CHDL < 40 mg/dL (hombres)** o **< 50 mg/dL (mujeres)**.
+- **Colesterol HDL (CHDL)**: **Bajo riesgo** si **CHDL < 40 mg/dL (hombres)** o **< 50 mg/dL (mujeres)**.
 - **Índice de Masa Corporal (IMC)**: Alto riesgo si **IMC > 30** (obesidad).
-- **Circunferencia de Cintura**:
-  - Alto riesgo si **Cintura > 102 cm (hombres)** o **> 88 cm (mujeres)**.
-- **Relación Cintura-Cadera**:
-  - Alto riesgo si **Relación > 0.9 (hombres)** o **> 0.85 (mujeres)**.
+- **Circunferencia de Cintura**: Alto riesgo si **Cintura > 102 cm (hombres)** o **> 88 cm (mujeres)**.
+- **Relación Cintura-Cadera**: Alto riesgo si **Relación > 0.9 (hombres)** o **> 0.85 (mujeres)**.
 
 #### Definición de la Variable de Interés:
 - **0 (Bajo riesgo):** El individuo **no cumple con ninguno** de los criterios de alto riesgo.
