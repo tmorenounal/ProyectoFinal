@@ -53,6 +53,12 @@ st.dataframe(data.head())
 st.write("### Información de los datos")
 st.dataframe(data.describe())
 
+
+# Histogramas de las variables numéricas
+
+st.data.hist(bins=30, figsize=(15, 10))
+st.plt.show()
+
 # Distribución de la variable objetivo
 st.write("#### Distribución de la Variable Objetivo")
 fig, ax = plt.subplots()
