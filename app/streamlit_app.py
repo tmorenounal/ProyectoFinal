@@ -53,6 +53,32 @@ st.dataframe(data.head())
 st.write("### Información de los datos")
 st.dataframe(data.describe())
 
+# Verificar que los datos se cargaron correctamente
+if data is None or data.empty:
+    st.error("No se han cargado datos o el archivo está vacío.")
+    st.stop()
+
+# Seleccionar solo columnas numéricas
+numerical_columns = data.select_dtypes(include=['number']).columns.tolist()
+
+# Validar que hay columnas numéricas antes de continuar
+if not numerical_columns:
+    st.error("No se encontraron variables numéricas en el dataset.")
+    st.stop()
+
+st.write("### Distribución de Variables Numéricas")
+
+# Usar selectbox para elegir una variable específica
+selected_variable = st.selectbox("Selecciona una variable numérica:", numerical_columns)
+
+fig, ax = plt.subplots()
+sns.histplot(data[selected_variable], bins=30, kde=True, ax=ax)
+ax.set_title(f'Distribución de {selected_variable}')
+ax.set_xlabel(selected_variable)
+ax.set_ylabel('Frecuencia')
+st.pyplot(fig)
+
+
 st.write("### Distribución de Todas las Variables Numéricas")
 
 for col in numerical_columns:
