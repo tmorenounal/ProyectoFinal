@@ -51,23 +51,30 @@ data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.item
 # Calcular el índice de riesgo cardiovascular
 data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
 
-# Definir un umbral fijo para clasificación (ajústalo según necesidad)
-umbral_fijo = 0.5  # Cambia este valor según el criterio médico o estadístico
+# Calcular el índice de riesgo cardiovascular
+data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
 
-# Crear la variable binaria basada en el umbral fijo
-data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > umbral_fijo).astype(int)
+# Definir un umbral fijo basado en una fracción del máximo
+umbral = data['Riesgo_Cardiovascular'].max() * 0.5  # Ajustar según necesidad
 
-# Mostrar información del umbral seleccionado
-st.write(f"Se ha utilizado un umbral fijo de **{umbral_fijo}** para clasificar el riesgo cardiovascular.")
+# Crear variable binaria de riesgo cardiovascular
+data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > umbral).astype(int)
 
-# Mostrar distribución después de aplicar el umbral
-st.write("#### Distribución de la Variable Objetivo")
+# Mostrar información sobre el umbral seleccionado
+st.write(f"Se ha utilizado un umbral de **{umbral:.2f}** basado en el 50% del valor máximo del índice.")
+
+# Mostrar el balance de clases
+st.write("#### Balance de Clases en la Variable Objetivo")
+st.write(data['Riesgo_Cardiovascular_Binario'].value_counts())
+
+# Visualizar distribución de clases
 fig, ax = plt.subplots()
 data['Riesgo_Cardiovascular_Binario'].value_counts().plot(kind='bar', ax=ax)
 ax.set_title('Distribución de Riesgo Cardiovascular')
 ax.set_xlabel('Riesgo Cardiovascular (0: Bajo, 1: Alto)')
 ax.set_ylabel('Frecuencia')
 st.pyplot(fig)
+
 
 
 # Mostrar datos
