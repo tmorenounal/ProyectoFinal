@@ -8,34 +8,51 @@ from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
 # Cargar los datos
-@st.cache_data  # Usar st.cache_data en lugar de st.cache
+@st.cache_data  # Usar cache_data para optimizar carga
 def load_data():
-    """
-    Carga los datos desde un archivo Excel.
-    
-    Retorna:
-        pd.DataFrame: Datos cargados.
-    """
-    return pd.read_excel('data/BancoXavantes837.xlsx')  # Asegurar la ruta correcta
+    try:
+        return pd.read_excel('../data/BancoXavantes837.xlsx')  # Asegurar la ruta correcta
+    except Exception as e:
+        st.error(f"Error al cargar el archivo: {e}")
+        return None
 
 data = load_data()
+if data is None:
+    st.stop()
 
-# Título de la aplicación
-st.title('Análisis de Riesgo Cardiovascular')
+# Limpiar nombres de columnas
+data.columns = data.columns.str.strip()
+
+# Definir pesos para calcular el índice de riesgo cardiovascular
+pesos = {
+    'CTOTAL': 0.2, 'CLDL': 0.3, 'CHDL': -0.2, 'Triglic': 0.2, 'CVLDL': 0.1,
+    'IMC': 0.15, 'BAI': 0.1, 'Cintura': 0.15, 'Cadera': -0.1, 'Grasa': 0.1,
+    'Edad': 0.2, 'Leptina': 0.05, 'FTO_Aditivo': 0.05
+}
+
+# Verificar que todas las columnas existen antes de calcular el índice de riesgo
+missing_columns = [col for col in pesos.keys() if col not in data.columns]
+if missing_columns:
+    st.error(f"Las siguientes columnas están ausentes en los datos: {missing_columns}")
+    st.stop()
+
+# Calcular el índice de riesgo cardiovascular
+data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
+
+# Crear variable binaria de riesgo cardiovascular
+data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > data['Riesgo_Cardiovascular'].median()).astype(int)
 
 # Mostrar los datos
+st.title('Análisis de Riesgo Cardiovascular')
 st.write("### Vista previa de los datos")
 st.write(data.head())
 
-# Análisis Exploratorio de Datos (EDA)
-st.write("### Análisis Exploratorio de Datos")
-
-# Distribución de la variable objetivo (Riesgo Cardiovascular)
+# Distribución de la variable objetivo
 st.write("#### Distribución de la Variable Objetivo")
 fig, ax = plt.subplots()
 data['Riesgo_Cardiovascular_Binario'].value_counts().plot(kind='bar', ax=ax)
@@ -53,9 +70,9 @@ st.pyplot(fig)
 
 # Preprocesamiento de datos
 def preprocess_data(data):
-    X = data.drop(columns=['IID', 'Riesgo_Cardiovascular', 'Riesgo_Cardiovascular_Binario'])
+    X = data.drop(columns=['Riesgo_Cardiovascular', 'Riesgo_Cardiovascular_Binario'])
     y = data['Riesgo_Cardiovascular_Binario']
-    X = pd.get_dummies(X, columns=['Sexo'], drop_first=True)
+    X = pd.get_dummies(X, drop_first=True)
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
     return X_scaled, y
@@ -69,58 +86,33 @@ option = st.selectbox('Técnica', ['Datos Originales', 'PCA', 't-SNE'])
 if option == 'PCA':
     pca = PCA(n_components=2)
     X_reduced = pca.fit_transform(X_scaled)
-    title = 'Visualización de Datos con PCA'
 elif option == 't-SNE':
     tsne = TSNE(n_components=2, random_state=42)
     X_reduced = tsne.fit_transform(X_scaled)
-    title = 'Visualización de Datos con t-SNE'
 else:
     X_reduced = X_scaled
-    title = 'Datos Originales'
-
-if option != 'Datos Originales':
-    fig, ax = plt.subplots()
-    scatter = ax.scatter(X_reduced[:, 0], X_reduced[:, 1], c=y, cmap='coolwarm', alpha=0.6)
-    ax.set_title(title)
-    ax.set_xlabel('Componente 1')
-    ax.set_ylabel('Componente 2')
-    plt.colorbar(scatter, label='Riesgo Cardiovascular (0: Bajo, 1: Alto)')
-    st.pyplot(fig)
 
 # Entrenar y evaluar modelos
-st.write("### Entrenamiento y Evaluación de Modelos")
 X_train, X_test, y_train, y_test = train_test_split(X_reduced, y, test_size=0.3, random_state=42)
 
-# Modelo SVM
 svm_model = SVC(kernel='linear', random_state=42)
 svm_model.fit(X_train, y_train)
 y_pred_svm = svm_model.predict(X_test)
 accuracy_svm = accuracy_score(y_test, y_pred_svm)
 
-# Modelo de Red Neuronal
 def create_nn_model(input_dim):
-    model = Sequential([
-        Dense(64, input_dim=input_dim, activation='relu'),
-        Dense(32, activation='relu'),
-        Dense(1, activation='sigmoid')
-    ])
+    model = Sequential()
+    model.add(Dense(64, input_dim=input_dim, activation='relu'))
+    model.add(Dense(32, activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
     return model
 
 nn_model = create_nn_model(X_train.shape[1])
-history = nn_model.fit(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2, verbose=0)
+nn_model.fit(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2, verbose=0)
 y_pred_nn = (nn_model.predict(X_test) > 0.5).astype(int)
 accuracy_nn = accuracy_score(y_test, y_pred_nn)
 
 st.write(f"#### Precisión del Modelo SVM: {accuracy_svm:.2f}")
 st.write(f"#### Precisión del Modelo de Red Neuronal: {accuracy_nn:.2f}")
 
-# Gráfica de precisión de Red Neuronal
-fig, ax = plt.subplots()
-ax.plot(history.history['accuracy'], label='Precisión en entrenamiento')
-ax.plot(history.history['val_accuracy'], label='Precisión en validación')
-ax.set_title('Precisión del Modelo de Red Neuronal')
-ax.set_xlabel('Épocas')
-ax.set_ylabel('Precisión')
-ax.legend()
-st.pyplot(fig)
