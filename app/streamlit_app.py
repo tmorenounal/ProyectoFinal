@@ -17,7 +17,7 @@ from tensorflow.keras.layers import Dense
 # Cargar los datos
 @st.cache
 def load_data():
-    return pd.read_csv('../data/tu_archivo.csv')
+    return pd.read_excel('../data/BancoXavantes837.xlsx')
 
 data = load_data()
 
