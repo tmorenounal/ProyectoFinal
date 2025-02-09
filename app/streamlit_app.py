@@ -88,15 +88,6 @@ ax.set_ylabel('Frecuencia')
 st.pyplot(fig)
 
 
-# Visualizar distribución de clases
-fig, ax = plt.subplots()
-data['Riesgo_Cardiovascular_Binario'].value_counts().plot(kind='bar', ax=ax)
-ax.set_title('Distribución de Riesgo Cardiovascular')
-ax.set_xlabel('Riesgo Cardiovascular (0: Bajo, 1: Alto)')
-ax.set_ylabel('Frecuencia')
-st.pyplot(fig)
-
-
 st.write("### Distribución de Variables Numéricas")
 
 # Obtener solo las columnas numéricas
