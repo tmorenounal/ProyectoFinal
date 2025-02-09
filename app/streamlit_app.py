@@ -25,7 +25,7 @@ def load_data():
         pd.DataFrame: Datos cargados.
     """
     # Asegúrate de que la ruta del archivo sea correcta
-    return pd.read_excel('data/BancoXavantes837.xlsx')  # Ruta relativa al archivo
+    return pd.read_csv('../data/BancoXavantes837.csv')  # Ruta relativa al archivo
 
 data = load_data()
 
