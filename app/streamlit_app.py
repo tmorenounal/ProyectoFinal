@@ -16,7 +16,8 @@ from tensorflow.keras.layers import Dense
 @st.cache_data  # Usar cache_data para optimizar carga
 def load_data():
     try:
-        return pd.read_excel('../data/BancoXavantes837.xlsx')  # Asegurar la ruta correcta
+        return df = pd.read_excel('/data/BancoXavantes837.xlsx')
+
     except Exception as e:
         st.error(f"Error al cargar el archivo: {e}")
         return None
