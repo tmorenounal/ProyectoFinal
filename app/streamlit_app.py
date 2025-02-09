@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import io
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
@@ -89,6 +90,14 @@ st.write("### Vista previa de los datos")
 st.dataframe(data.head())
 st.write("### Información de los datos")
 st.dataframe(data.describe())
+# Capturar la información del DataFrame
+buffer = io.StringIO()
+data.info(buf=buffer)  # Captura la salida de data.info()
+info_str = buffer.getvalue()  # Convierte el buffer en string
+
+st.write("### Información del DataFrame")
+st.text(info_str)  # Muestra el contenido de info() en formato de texto
+
 st.write("""
 ### Variable Objetivo: Riesgo Cardiovascular
 
