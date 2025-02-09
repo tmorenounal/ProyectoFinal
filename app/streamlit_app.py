@@ -110,16 +110,6 @@ if st.button(f"Ver distribución de {selected_variable}"):
     ax.set_ylabel('Frecuencia')
     st.pyplot(fig)
 
-
-# Distribución de la variable objetivo
-st.write("#### Distribución de la Variable Objetivo")
-fig, ax = plt.subplots()
-data['Riesgo_Cardiovascular_Binario'].value_counts().plot(kind='bar', ax=ax)
-ax.set_title('Distribución de Riesgo Cardiovascular')
-ax.set_xlabel('Riesgo (0: Bajo, 1: Alto)')
-ax.set_ylabel('Frecuencia')
-st.pyplot(fig)
-
 # Matriz de correlación
 st.write("#### Matriz de Correlación")
 fig, ax = plt.subplots(figsize=(12, 8))
