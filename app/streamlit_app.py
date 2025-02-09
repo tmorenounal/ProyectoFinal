@@ -75,6 +75,19 @@ st.write(f"Se ha utilizado un umbral de **{umbral:.2f}** basado en el 50% del va
 st.write("#### Balance de Clases en la Variable Objetivo")
 st.write(data['Riesgo_Cardiovascular_Binario'].value_counts())
 
+st.write("### Histograma de la Distribución del Riesgo Cardiovascular")
+
+# Crear el histograma
+fig, ax = plt.subplots()
+sns.histplot(data['Riesgo_Cardiovascular'], bins=30, kde=True, ax=ax, color='blue')
+ax.set_title('Distribución del Índice de Riesgo Cardiovascular')
+ax.set_xlabel('Riesgo Cardiovascular')
+ax.set_ylabel('Frecuencia')
+
+# Mostrar la gráfica en Streamlit
+st.pyplot(fig)
+
+
 # Visualizar distribución de clases
 fig, ax = plt.subplots()
 data['Riesgo_Cardiovascular_Binario'].value_counts().plot(kind='bar', ax=ax)
