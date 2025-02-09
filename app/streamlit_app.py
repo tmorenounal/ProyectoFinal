@@ -63,7 +63,7 @@ data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > umbral)
 
 
 # Mostrar datos
-st.title('Análisis de Riesgo Cardiovascular')
+st.title('Análisis de Enfermedades Cardiovasculares en la Población Indígena Xavante de Brasil')
 st.write("### Vista previa de los datos")
 st.dataframe(data.head())
 st.write("### Información de los datos")
