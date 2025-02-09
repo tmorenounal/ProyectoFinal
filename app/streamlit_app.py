@@ -13,6 +13,7 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
+import openpyxl
 
 # Cargar los datos
 @st.cache_data  # Usar st.cache_data en lugar de st.cache
