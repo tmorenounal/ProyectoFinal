@@ -60,6 +60,14 @@ umbral = data['Riesgo_Cardiovascular'].max() * 0.5  # Ajustar según necesidad
 # Crear variable binaria de riesgo cardiovascular
 data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > umbral).astype(int)
 
+
+
+# Mostrar datos
+st.title('Análisis de Riesgo Cardiovascular')
+st.write("### Vista previa de los datos")
+st.dataframe(data.head())
+st.write("### Información de los datos")
+st.dataframe(data.describe())
 # Mostrar información sobre el umbral seleccionado
 st.write(f"Se ha utilizado un umbral de **{umbral:.2f}** basado en el 50% del valor máximo del índice.")
 
@@ -75,14 +83,6 @@ ax.set_xlabel('Riesgo Cardiovascular (0: Bajo, 1: Alto)')
 ax.set_ylabel('Frecuencia')
 st.pyplot(fig)
 
-
-
-# Mostrar datos
-st.title('Análisis de Riesgo Cardiovascular')
-st.write("### Vista previa de los datos")
-st.dataframe(data.head())
-st.write("### Información de los datos")
-st.dataframe(data.describe())
 
 st.write("### Distribución de Variables Numéricas")
 
