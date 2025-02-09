@@ -8,16 +8,15 @@ from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
 # Cargar los datos
-@st.cache_data  # Usar cache_data para optimizar carga
+@st.cache_data
 def load_data():
     try:
-        return  pd.read_excel('BancoXavantes837.xlsx')  # Asegurar la ruta correcta
-
+        return pd.read_excel('BancoXavantes837.xlsx')
     except Exception as e:
         st.error(f"Error al cargar el archivo: {e}")
         return None
@@ -36,29 +35,28 @@ pesos = {
     'Edad': 0.2, 'Leptina': 0.05, 'FTO_Aditivo': 0.05
 }
 
-# Verificar que todas las columnas existen antes de calcular el índice de riesgo
+# Verificar la existencia de columnas necesarias
 missing_columns = [col for col in pesos.keys() if col not in data.columns]
 if missing_columns:
-    st.error(f"Las siguientes columnas están ausentes en los datos: {missing_columns}")
+    st.error(f"Faltan las siguientes columnas: {missing_columns}")
     st.stop()
 
 # Calcular el índice de riesgo cardiovascular
-data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
+data['Riesgo_Cardiovascular'] = data[list(pesos.keys())].mul(pesos).sum(axis=1)
 
-# Crear variable binaria de riesgo cardiovascular
 data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > data['Riesgo_Cardiovascular'].median()).astype(int)
 
-# Mostrar los datos
+# Mostrar datos
 st.title('Análisis de Riesgo Cardiovascular')
 st.write("### Vista previa de los datos")
-st.write(data.head())
+st.dataframe(data.head())
 
 # Distribución de la variable objetivo
 st.write("#### Distribución de la Variable Objetivo")
 fig, ax = plt.subplots()
 data['Riesgo_Cardiovascular_Binario'].value_counts().plot(kind='bar', ax=ax)
 ax.set_title('Distribución de Riesgo Cardiovascular')
-ax.set_xlabel('Riesgo Cardiovascular (0: Bajo, 1: Alto)')
+ax.set_xlabel('Riesgo (0: Bajo, 1: Alto)')
 ax.set_ylabel('Frecuencia')
 st.pyplot(fig)
 
@@ -88,32 +86,37 @@ if option == 'PCA':
     pca = PCA(n_components=2)
     X_reduced = pca.fit_transform(X_scaled)
 elif option == 't-SNE':
+    if X_scaled.shape[1] > 50:
+        st.warning("t-SNE puede ser lento con muchas dimensiones, considere PCA primero.")
     tsne = TSNE(n_components=2, random_state=42)
     X_reduced = tsne.fit_transform(X_scaled)
 else:
     X_reduced = X_scaled
 
-# Entrenar y evaluar modelos
+# Dividir datos
 X_train, X_test, y_train, y_test = train_test_split(X_reduced, y, test_size=0.3, random_state=42)
 
+# Entrenar modelo SVM
 svm_model = SVC(kernel='linear', random_state=42)
 svm_model.fit(X_train, y_train)
 y_pred_svm = svm_model.predict(X_test)
 accuracy_svm = accuracy_score(y_test, y_pred_svm)
 
 def create_nn_model(input_dim):
-    model = Sequential()
-    model.add(Dense(64, input_dim=input_dim, activation='relu'))
-    model.add(Dense(32, activation='relu'))
-    model.add(Dense(1, activation='sigmoid'))
+    model = Sequential([
+        Dense(64, input_dim=input_dim, activation='relu'),
+        Dense(32, activation='relu'),
+        Dense(1, activation='sigmoid')
+    ])
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
     return model
 
+# Entrenar modelo de red neuronal
 nn_model = create_nn_model(X_train.shape[1])
 nn_model.fit(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2, verbose=0)
 y_pred_nn = (nn_model.predict(X_test) > 0.5).astype(int)
 accuracy_nn = accuracy_score(y_test, y_pred_nn)
 
+# Mostrar resultados
 st.write(f"#### Precisión del Modelo SVM: {accuracy_svm:.2f}")
 st.write(f"#### Precisión del Modelo de Red Neuronal: {accuracy_nn:.2f}")
-
