@@ -3,7 +3,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
@@ -15,9 +15,16 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
 # Cargar los datos
-@st.cache
+@st.cache_data  # Usar st.cache_data en lugar de st.cache
 def load_data():
-    return pd.read_excel('../data/BancoXavantes837.xlsx')
+    """
+    Carga los datos desde un archivo Excel.
+    
+    Retorna:
+        pd.DataFrame: Datos cargados.
+    """
+    # Asegúrate de que la ruta del archivo sea correcta
+    return pd.read_excel('data/BancoXavantes837.xlsx')  # Ruta relativa al archivo
 
 data = load_data()
 
@@ -49,6 +56,15 @@ st.pyplot(fig)
 
 # Preprocesamiento de datos
 def preprocess_data(data):
+    """
+    Preprocesa los datos: codifica variables categóricas y escala las características.
+    
+    Parámetros:
+        data (pd.DataFrame): Datos originales.
+    
+    Retorna:
+        tuple: (X_scaled, y), donde X_scaled son las características escaladas y y es la variable objetivo.
+    """
     X = data.drop(columns=['IID', 'Riesgo_Cardiovascular', 'Riesgo_Cardiovascular_Binario'])
     y = data['Riesgo_Cardiovascular_Binario']  # Variable de interés
     X = pd.get_dummies(X, columns=['Sexo'], drop_first=True)
