@@ -65,21 +65,21 @@ data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > umbral)
 # Mostrar datos
 st.title('Análisis de Enfermedades Cardiovasculares en la Población Indígena Xavante de Brasil')
 st.write('La siguiente base de datos pertenece a una población de indígenas Xavantes de Brasil, la cual cuenta con variables importantes para determinar enfermedades cardiovasculares en la población. La base de datos incluye las siguientes variables:
-    - Sexo: Género de los individuos (hombre o mujer).
-    - Edad: Edad en años.
-    - Leptina: Nivel de leptina, una hormona relacionada con la regulación del apetito y el metabolismo.
-    - Grasa: Porcentaje de grasa corporal.
-    - IMC: Índice de Masa Corporal, una medida de la relación entre peso y altura.
-    - BAI: Índice de Adiposidad Corporal, una medida alternativa al IMC.
-    - Cintura: Circunferencia de la cintura en centímetros.
-    - Cadera: Circunferencia de la cadera en centímetros.
-    - CVLDL: Colesterol de lipoproteínas de muy baja densidad.
-    - Triglic: Nivel de triglicéridos en sangre.
-    - CTOTAL: Colesterol total.
-    - CLDL: Colesterol de lipoproteínas de baja densidad (colesterol "malo").
-    - CHDL: Colesterol de lipoproteínas de alta densidad (colesterol "bueno").
-    - FTO_Aditivo: Variante genética asociada con la obesidad y el riesgo cardiovascular.
-    ')
+        - Sexo: Género de los individuos (hombre o mujer).
+        - Edad: Edad en años.
+        - Leptina: Nivel de leptina, una hormona relacionada con la regulación del apetito y el metabolismo.
+        - Grasa: Porcentaje de grasa corporal.
+        - IMC: Índice de Masa Corporal, una medida de la relación entre peso y altura.
+        - BAI: Índice de Adiposidad Corporal, una medida alternativa al IMC.
+        - Cintura: Circunferencia de la cintura en centímetros.
+        - Cadera: Circunferencia de la cadera en centímetros.
+        - CVLDL: Colesterol de lipoproteínas de muy baja densidad.
+        - Triglic: Nivel de triglicéridos en sangre.
+        - CTOTAL: Colesterol total.
+        - CLDL: Colesterol de lipoproteínas de baja densidad (colesterol "malo").
+        - CHDL: Colesterol de lipoproteínas de alta densidad (colesterol "bueno").
+        - FTO_Aditivo: Variante genética asociada con la obesidad y el riesgo cardiovascular.
+        ')
 st.write("### Vista previa de los datos")
 st.dataframe(data.head())
 st.write("### Información de los datos")
