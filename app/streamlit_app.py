@@ -45,6 +45,31 @@ if missing_columns:
 data['Riesgo_Cardiovascular'] = data[list(pesos.keys())].mul(pesos).sum(axis=1)
 
 data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > data['Riesgo_Cardiovascular'].median()).astype(int)
+# Calcular el índice de riesgo cardiovascular
+data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
+
+# Permitir al usuario elegir un umbral para clasificar el riesgo
+st.write("### Configuración del Umbral de Clasificación")
+umbral = st.slider("Selecciona el umbral de riesgo cardiovascular:", 
+                   float(data['Riesgo_Cardiovascular'].min()), 
+                   float(data['Riesgo_Cardiovascular'].max()), 
+                   float(data['Riesgo_Cardiovascular'].median()))
+
+# Crear la variable binaria basada en el umbral seleccionado
+data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > umbral).astype(int)
+
+# Mostrar información del umbral seleccionado
+st.write(f"Se ha seleccionado un umbral de **{umbral:.2f}** para clasificar el riesgo cardiovascular.")
+
+# Mostrar distribución después de aplicar el umbral
+st.write("#### Distribución de la Variable Objetivo")
+fig, ax = plt.subplots()
+data['Riesgo_Cardiovascular_Binario'].value_counts().plot(kind='bar', ax=ax)
+ax.set_title('Distribución de Riesgo Cardiovascular')
+ax.set_xlabel('Riesgo Cardiovascular (0: Bajo, 1: Alto)')
+ax.set_ylabel('Frecuencia')
+st.pyplot(fig)
+
 
 # Mostrar datos
 st.title('Análisis de Riesgo Cardiovascular')
