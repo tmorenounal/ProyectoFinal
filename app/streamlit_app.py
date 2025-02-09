@@ -50,6 +50,8 @@ data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > data['R
 st.title('Análisis de Riesgo Cardiovascular')
 st.write("### Vista previa de los datos")
 st.dataframe(data.head())
+st.write("### Información de los datos")
+st.dataframe(data.info())
 
 # Distribución de la variable objetivo
 st.write("#### Distribución de la Variable Objetivo")
