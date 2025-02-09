@@ -89,7 +89,29 @@ st.write("### Vista previa de los datos")
 st.dataframe(data.head())
 st.write("### Información de los datos")
 st.dataframe(data.describe())
-# Mostrar información sobre el umbral seleccionado
+st.write("""
+### Variable Objetivo: Riesgo Cardiovascular
+
+La variable objetivo de este estudio es el **Riesgo Cardiovascular**, que se determina en función de los siguientes criterios clínicos y umbrales establecidos:
+
+- **Colesterol Total (CTOTAL)**: Alto riesgo si **CTOTAL > 200 mg/dL**.
+- **Triglicéridos (Triglic)**: Alto riesgo si **Triglic > 150 mg/dL**.
+- **Colesterol LDL (CLDL)**: Alto riesgo si **CLDL > 130 mg/dL**.
+- **Colesterol HDL (CHDL)**:
+  - **Bajo riesgo** si **CHDL < 40 mg/dL (hombres)** o **< 50 mg/dL (mujeres)**.
+- **Índice de Masa Corporal (IMC)**: Alto riesgo si **IMC > 30** (obesidad).
+- **Circunferencia de Cintura**:
+  - Alto riesgo si **Cintura > 102 cm (hombres)** o **> 88 cm (mujeres)**.
+- **Relación Cintura-Cadera**:
+  - Alto riesgo si **Relación > 0.9 (hombres)** o **> 0.85 (mujeres)**.
+
+#### Definición de la Variable de Interés:
+- **0 (Bajo riesgo):** El individuo **no cumple con ninguno** de los criterios de alto riesgo.
+- **1 (Alto riesgo):** El individuo **cumple con al menos uno** de los criterios de alto riesgo mencionados anteriormente.
+
+Esta variable se calcula automáticamente en el análisis utilizando los umbrales clínicos establecidos.
+""")
+
 st.write(f"Se ha utilizado un umbral de **{umbral:.2f}** basado en el 50% del valor máximo del índice.")
 
 # Mostrar el balance de clases
