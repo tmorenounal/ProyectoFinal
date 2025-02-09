@@ -16,12 +16,12 @@ from tensorflow.keras.layers import Dense
 @st.cache_data  # Usar st.cache_data en lugar de st.cache
 def load_data():
     """
-    Carga los datos desde un archivo CSV.
+    Carga los datos desde un archivo Excel.
     
     Retorna:
         pd.DataFrame: Datos cargados.
     """
-    return pd.read_csv('data/BancoXavantes837.csv')  # Asegurar la ruta correcta
+    return pd.read_excel('data/BancoXavantes837.xlsx')  # Asegurar la ruta correcta
 
 data = load_data()
 
@@ -124,4 +124,3 @@ ax.set_xlabel('Épocas')
 ax.set_ylabel('Precisión')
 ax.legend()
 st.pyplot(fig)
-
