@@ -4,6 +4,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
@@ -27,20 +28,29 @@ st.title('Análisis de Riesgo Cardiovascular')
 st.write("### Vista previa de los datos")
 st.write(data.head())
 
-# Análisis exploratorio
+# Análisis Exploratorio de Datos (EDA)
 st.write("### Análisis Exploratorio de Datos")
-st.write("Resumen estadístico:")
-st.write(data.describe())
 
-st.write("Distribución de la variable objetivo (Riesgo Cardiovascular):")
+# Distribución de la variable objetivo (Riesgo Cardiovascular)
+st.write("#### Distribución de la Variable Objetivo")
 fig, ax = plt.subplots()
 data['Riesgo_Cardiovascular_Binario'].value_counts().plot(kind='bar', ax=ax)
+ax.set_title('Distribución de Riesgo Cardiovascular')
+ax.set_xlabel('Riesgo Cardiovascular (0: Bajo, 1: Alto)')
+ax.set_ylabel('Frecuencia')
+st.pyplot(fig)
+
+# Matriz de correlación
+st.write("#### Matriz de Correlación")
+fig, ax = plt.subplots(figsize=(12, 8))
+sns.heatmap(data.corr(), annot=True, cmap='coolwarm', ax=ax)
+ax.set_title('Matriz de Correlación')
 st.pyplot(fig)
 
 # Preprocesamiento de datos
 def preprocess_data(data):
     X = data.drop(columns=['IID', 'Riesgo_Cardiovascular', 'Riesgo_Cardiovascular_Binario'])
-    y = data['Riesgo_Cardiovascular_Binario']
+    y = data['Riesgo_Cardiovascular_Binario']  # Variable de interés
     X = pd.get_dummies(X, columns=['Sexo'], drop_first=True)
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
@@ -72,10 +82,11 @@ if option != 'Datos Originales':
     ax.set_title(title)
     ax.set_xlabel('Componente 1')
     ax.set_ylabel('Componente 2')
+    plt.colorbar(ax.scatter(X_reduced[:, 0], X_reduced[:, 1], c=y, cmap='coolwarm', alpha=0.6), label='Riesgo Cardiovascular (0: Bajo, 1: Alto)')
     st.pyplot(fig)
 
 # Entrenar y evaluar modelos
-st.write("### Comparación de Modelos")
+st.write("### Entrenamiento y Evaluación de Modelos")
 
 # Dividir los datos en entrenamiento y prueba
 X_train, X_test, y_train, y_test = train_test_split(X_reduced, y, test_size=0.3, random_state=42)
@@ -114,7 +125,7 @@ ax.set_ylabel('Precisión')
 ax.legend()
 st.pyplot(fig)
 
-# Comparación de modelos
+# Comparación de modelos en diferentes representaciones
 st.write("### Comparación de Modelos en Diferentes Representaciones")
 
 # Crear un DataFrame para la comparación
