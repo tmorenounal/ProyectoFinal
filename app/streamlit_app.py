@@ -13,6 +13,7 @@ from sklearn.metrics import accuracy_score
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from sklearn.metrics import confusion_matrix, classification_report
+from tensorflow.keras.optimizers import SGD
 
 # Cargar los datos
 @st.cache_data
@@ -169,66 +170,149 @@ st.pyplot(fig)
 
 ############################################################################################
 
-X = data[list(pesos.keys())]
-y = data['Riesgo_Cardiovascular_Binario']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
+# Preprocesamiento de datos
+def preprocess_data(data):
+    X = data.drop(columns=['IID', 'Riesgo_Cardiovascular', 'Riesgo_Cardiovascular_Binario'])
+    y = data['Riesgo_Cardiovascular_Binario']  # Variable de interés
+    X = pd.get_dummies(X, columns=['Sexo'], drop_first=True)
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+    return X_scaled, y
 
-# Modelo SVM con datos originales
-svm_model = SVC(probability=True)
-svm_model.fit(X_train_scaled, y_train)
-y_pred_svm = svm_model.predict(X_test_scaled)
-y_pred_svm_prob = svm_model.predict_proba(X_test_scaled)[:, 1]
-st.write("### Evaluación SVM con Datos Originales")
-st.text(classification_report(y_test, y_pred_svm))
+X_scaled, y = preprocess_data(data)
 
-# Reducción de Dimensionalidad con PCA
+# Dividir los datos en entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, random_state=42)
+
+# Función para graficar la curva ROC
+def plot_roc_curve(y_true, y_pred_proba, title):
+    fpr, tpr, _ = roc_curve(y_true, y_pred_proba)
+    roc_auc = auc(fpr, tpr)
+    plt.figure(figsize=(8, 6))
+    plt.plot(fpr, tpr, color='blue', lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
+    plt.plot([0, 1], [0, 1], color='gray', linestyle='--')
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title(title)
+    plt.legend(loc='lower right')
+    st.pyplot(plt)
+
+# Ajustar y evaluar SVM con datos originales
+st.write("### SVM con Datos Originales")
+svm_model = SVC(kernel='linear', probability=True, random_state=42)
+svm_model.fit(X_train, y_train)
+y_pred_svm = svm_model.predict(X_test)
+y_pred_proba_svm = svm_model.predict_proba(X_test)[:, 1]
+accuracy_svm = accuracy_score(y_test, y_pred_svm)
+st.write(f"Precisión (SVM): {accuracy_svm:.2f}")
+st.write("Matriz de Confusión (SVM):")
+st.write(confusion_matrix(y_test, y_pred_svm))
+plot_roc_curve(y_test, y_pred_proba_svm, 'Curva ROC - SVM (Datos Originales)')
+
+# Reducción de dimensionalidad con PCA
 pca = PCA(n_components=2)
-X_train_pca = pca.fit_transform(X_train_scaled)
-X_test_pca = pca.transform(X_test_scaled)
-svm_pca = SVC(probability=True)
-svm_pca.fit(X_train_pca, y_train)
-y_pred_pca = svm_pca.predict(X_test_pca)
-st.write("### Evaluación SVM con PCA")
-st.text(classification_report(y_test, y_pred_pca))
+X_pca = pca.fit_transform(X_scaled)
+X_train_pca, X_test_pca, y_train, y_test = train_test_split(X_pca, y, test_size=0.3, random_state=42)
 
-# Reducción de Dimensionalidad con t-SNE
+# Ajustar y evaluar SVM con PCA
+st.write("### SVM con PCA")
+svm_model_pca = SVC(kernel='linear', probability=True, random_state=42)
+svm_model_pca.fit(X_train_pca, y_train)
+y_pred_svm_pca = svm_model_pca.predict(X_test_pca)
+y_pred_proba_svm_pca = svm_model_pca.predict_proba(X_test_pca)[:, 1]
+accuracy_svm_pca = accuracy_score(y_test, y_pred_svm_pca)
+st.write(f"Precisión (SVM con PCA): {accuracy_svm_pca:.2f}")
+st.write("Matriz de Confusión (SVM con PCA):")
+st.write(confusion_matrix(y_test, y_pred_svm_pca))
+plot_roc_curve(y_test, y_pred_proba_svm_pca, 'Curva ROC - SVM (PCA)')
+
+# Reducción de dimensionalidad con t-SNE
 tsne = TSNE(n_components=2, random_state=42)
-X_train_tsne = tsne.fit_transform(X_train_scaled)
-X_test_tsne = tsne.fit_transform(X_test_scaled)
-svm_tsne = SVC(probability=True)
-svm_tsne.fit(X_train_tsne, y_train)
-y_pred_tsne = svm_tsne.predict(X_test_tsne)
-st.write("### Evaluación SVM con t-SNE")
-st.text(classification_report(y_test, y_pred_tsne))
+X_tsne = tsne.fit_transform(X_scaled)
+X_train_tsne, X_test_tsne, y_train, y_test = train_test_split(X_tsne, y, test_size=0.3, random_state=42)
 
-# Red Neuronal con PCA
-model_pca = Sequential([
-    Dense(144, activation='relu', input_shape=(2,)),
-    Dense(144, activation='relu'),
-    Dense(144, activation='relu'),
-    Dense(144, activation='relu'),
-    Dense(1, activation='sigmoid')
-])
-optimizer = SGD(learning_rate=0.03290099263663578)
-model_pca.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
-model_pca.fit(X_train_pca, y_train, epochs=43, batch_size=72, verbose=1)
-st.write("### Evaluación Red Neuronal con PCA")
-loss_pca, acc_pca = model_pca.evaluate(X_test_pca, y_test)
-st.write(f"Loss: {loss_pca}, Accuracy: {acc_pca}")
+# Ajustar y evaluar SVM con t-SNE
+st.write("### SVM con t-SNE")
+svm_model_tsne = SVC(kernel='linear', probability=True, random_state=42)
+svm_model_tsne.fit(X_train_tsne, y_train)
+y_pred_svm_tsne = svm_model_tsne.predict(X_test_tsne)
+y_pred_proba_svm_tsne = svm_model_tsne.predict_proba(X_test_tsne)[:, 1]
+accuracy_svm_tsne = accuracy_score(y_test, y_pred_svm_tsne)
+st.write(f"Precisión (SVM con t-SNE): {accuracy_svm_tsne:.2f}")
+st.write("Matriz de Confusión (SVM con t-SNE):")
+st.write(confusion_matrix(y_test, y_pred_svm_tsne))
+plot_roc_curve(y_test, y_pred_proba_svm_tsne, 'Curva ROC - SVM (t-SNE)')
 
-# Red Neuronal con t-SNE
-model_tsne = Sequential([
-    Dense(144, activation='relu', input_shape=(2,)),
-    Dense(144, activation='relu'),
-    Dense(144, activation='relu'),
-    Dense(144, activation='relu'),
-    Dense(1, activation='sigmoid')
-])
-model_tsne.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
-model_tsne.fit(X_train_tsne, y_train, epochs=43, batch_size=72, verbose=1)
-st.write("### Evaluación Red Neuronal con t-SNE")
-loss_tsne, acc_tsne = model_tsne.evaluate(X_test_tsne, y_test)
-st.write(f"Loss: {loss_tsne}, Accuracy: {acc_tsne}")
+# Hiperparámetros de la Red Neuronal
+hyperparams = {
+    'depth': 4,
+    'epochs': 43,
+    'num_units': 144,
+    'optimizer': 'sgd',
+    'activation': 'relu',
+    'batch_size': 72,
+    'learning_rate': 0.0329
+}
+
+# Función para crear la Red Neuronal
+def create_nn_model(input_dim, hyperparams):
+    model = Sequential()
+    for _ in range(hyperparams['depth'] - 1):
+        model.add(Dense(hyperparams['num_units'], activation=hyperparams['activation']))
+    model.add(Dense(1, activation='sigmoid'))
+    optimizer = SGD(learning_rate=hyperparams['learning_rate'])
+    model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
+    return model
+
+# Ajustar y evaluar Red Neuronal con datos originales
+st.write("### Red Neuronal con Datos Originales")
+nn_model = create_nn_model(X_train.shape[1], hyperparams)
+history = nn_model.fit(X_train, y_train, epochs=hyperparams['epochs'], batch_size=hyperparams['batch_size'], validation_split=0.2, verbose=0)
+y_pred_nn = (nn_model.predict(X_test) > 0.5).astype(int)
+y_pred_proba_nn = nn_model.predict(X_test).flatten()
+accuracy_nn = accuracy_score(y_test, y_pred_nn)
+st.write(f"Precisión (Red Neuronal): {accuracy_nn:.2f}")
+st.write("Matriz de Confusión (Red Neuronal):")
+st.write(confusion_matrix(y_test, y_pred_nn))
+plot_roc_curve(y_test, y_pred_proba_nn, 'Curva ROC - Red Neuronal (Datos Originales)')
+
+# Gráfica de precisión y pérdida durante el entrenamiento
+fig, ax = plt.subplots(1, 2, figsize=(12, 5))
+ax[0].plot(history.history['accuracy'], label='Precisión en entrenamiento')
+ax[0].plot(history.history['val_accuracy'], label='Precisión en validación')
+ax[0].set_title('Precisión durante el Entrenamiento')
+ax[0].set_xlabel('Épocas')
+ax[0].set_ylabel('Precisión')
+ax[0].legend()
+
+ax[1].plot(history.history['loss'], label='Pérdida en entrenamiento')
+ax[1].plot(history.history['val_loss'], label='Pérdida en validación')
+ax[1].set_title('Pérdida durante el Entrenamiento')
+ax[1].set_xlabel('Épocas')
+ax[1].set_ylabel('Pérdida')
+ax[1].legend()
+st.pyplot(fig)
+
+# Ajustar y evaluar Red Neuronal con PCA
+st.write("### Red Neuronal con PCA")
+nn_model_pca = create_nn_model(X_train_pca.shape[1], hyperparams)
+history_pca = nn_model_pca.fit(X_train_pca, y_train, epochs=hyperparams['epochs'], batch_size=hyperparams['batch_size'], validation_split=0.2, verbose=0)
+y_pred_nn_pca = (nn_model_pca.predict(X_test_pca) > 0.5).astype(int)
+y_pred_proba_nn_pca = nn_model_pca.predict(X_test_pca).flatten()
+accuracy_nn_pca = accuracy_score(y_test, y_pred_nn_pca)
+st.write(f"Precisión (Red Neuronal con PCA): {accuracy_nn_pca:.2f}")
+st.write("Matriz de Confusión (Red Neuronal con PCA):")
+st.write(confusion_matrix(y_test, y_pred_nn_pca))
+plot_roc_curve(y_test, y_pred_proba_nn_pca, 'Curva ROC - Red Neuronal (PCA)')
+
+# Ajustar y evaluar Red Neuronal con t-SNE
+st.write("### Red Neuronal con t-SNE")
+nn_model_tsne = create_nn_model(X_train_tsne.shape[1], hyperparams)
+history_tsne = nn_model_tsne.fit(X_train_tsne, y_train, epochs=hyperparams['epochs'], batch_size=hyperparams['batch_size'], validation_split=0.2, verbose=0)
+y_pred_nn_tsne = (nn_model_tsne.predict(X_test_tsne) > 0.5).astype(int)
+y_pred_proba_nn_tsne = nn_model_tsne.predict(X_test_tsne).flatten()
+accuracy_nn_tsne = accuracy_score(y_test, y_pred_nn_tsne)
+st.write(f"Precisión (Red Neuronal con t-SNE): {accuracy_nn_tsne:.2f}")
+st.write("Matriz de Confusión (Red Neuronal con t-SNE):")
+st.write(confusion_matrix(y_test, y_pred_nn_tsne))
+plot_roc_curve(y_test, y_pred_proba_nn_tsne, 'Curva ROC - Red Neuronal (t-SNE)')
