@@ -18,18 +18,45 @@ from sklearn.metrics import confusion_matrix, classification_report
 from tensorflow.keras.optimizers import SGD
 from sklearn.metrics import roc_curve, auc
 
+# Configuración de la página
+st.set_page_config(page_title="Análisis Cardiovascular", page_icon="❤️", layout="wide")
+
 # Menú de navegación en el sidebar
-st.sidebar.title("Navegación")
-section = st.sidebar.radio(
-    "Selecciona una sección:",
-    [
-        "Carga de Datos",
-        "Análisis Exploratorio",
-        "Reducción de Dimensionalidad",
-        "Modelos de Machine Learning",
-        "Predicción de Riesgo Cardiovascular",
-    ],
-)
+st.sidebar.title("Navegación 🗂️")
+st.sidebar.markdown("---")
+
+# Submenú para Análisis de Datos
+with st.sidebar.expander("📊 Análisis de Datos", expanded=True):
+    section_analisis = st.radio(
+        "Selecciona una sección:",
+        [
+            "Carga de Datos",
+            "Análisis Exploratorio",
+            "Reducción de Dimensionalidad",
+        ],
+    )
+
+# Submenú para Modelos de Machine Learning
+with st.sidebar.expander("🤖 Modelos de Machine Learning", expanded=True):
+    section_modelos = st.radio(
+        "Selecciona una sección:",
+        [
+            "SVM con Datos Originales",
+            "SVM con PCA",
+            "SVM con t-SNE",
+            "Red Neuronal",
+        ],
+    )
+
+# Submenú para Predicciones
+with st.sidebar.expander("🔮 Predicciones", expanded=True):
+    section_predicciones = st.radio(
+        "Selecciona una sección:",
+        [
+            "Predicción de Riesgo Cardiovascular",
+        ],
+    )
+
 
 
 
