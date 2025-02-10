@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import io
+import pickle
+import gzip
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
@@ -299,11 +301,12 @@ def load_scaler():
         with gzip.open('scaler.pkl.gz', 'rb') as f:
             scaler = pickle.load(f)
         return scaler
-    except Exception:
+    except Exception as e:
+        st.warning(f"No se encontró el escalador: {e}")
         return None
 
-
 def user_input():
+    """Captura los datos de entrada del usuario."""
     sexo = st.selectbox("Sexo", ["Femenino", "Masculino"])
     edad = st.number_input("Edad", min_value=18, max_value=100, step=1)
     leptina = st.number_input("Leptina", min_value=0.0, step=0.1)
@@ -325,15 +328,21 @@ def user_input():
                       cvldl, triglic, ctotal, cldl, chdl, fto_aditivo]])
     return data
 
+# Título de la aplicación
 st.title("Predicción de Riesgo Cardiovascular")
-model, scaler = load_scaler()
+
+# Cargar modelo y escalador
+model = load_model()
+scaler = load_scaler()
+
+# Obtener datos del usuario
 input_data = user_input()
 
-scaled_data = scaler.transform(input_data)
-prediction = model.predict(scaled_data)
-prediction_label = "Alto Riesgo" if prediction[0] == 1 else "Bajo Riesgo"
-
-st.write(f"### Resultado de la Predicción: {prediction_label}")
-
-
-
+# Verificar si el modelo y el escalador se cargaron correctamente
+if model is not None and scaler is not None:
+    scaled_data = scaler.transform(input_data)  # Normalizar datos
+    prediction = model.predict(scaled_data)  # Realizar predicción
+    prediction_label = "Alto Riesgo" if prediction[0] == 1 else "Bajo Riesgo"
+    st.write(f"### Resultado de la Predicción: {prediction_label}")
+else:
+    st.error("No se puede realizar la predicción porque el modelo o el escalador no se cargaron correctamente.")
