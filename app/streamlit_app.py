@@ -22,22 +22,20 @@ from sklearn.metrics import roc_curve, auc
 st.set_page_config(page_title="Análisis Cardiovascular", page_icon="❤️", layout="wide")
 
 # Menú de navegación en el sidebar
-st.sidebar.title("Navegación 🗂️")
+st.sidebar.title("Navegación")
 st.sidebar.markdown("---")
 
 # Submenú para Análisis de Datos
-with st.sidebar.expander("📊 Análisis de Datos", expanded=True):
+with st.sidebar.expander(" Análisis de Datos", expanded=True):
     section_analisis = st.radio(
         "Selecciona una sección:",
         [
-            "Carga de Datos",
             "Análisis Exploratorio",
-            "Reducción de Dimensionalidad",
         ],
     )
 
 # Submenú para Modelos de Machine Learning
-with st.sidebar.expander("🤖 Modelos de Machine Learning", expanded=True):
+with st.sidebar.expander(" Modelos Ajustados", expanded=True):
     section_modelos = st.radio(
         "Selecciona una sección:",
         [
@@ -45,6 +43,8 @@ with st.sidebar.expander("🤖 Modelos de Machine Learning", expanded=True):
             "SVM con PCA",
             "SVM con t-SNE",
             "Red Neuronal",
+            "Red Neuronal con PCA",
+            "Red Neuronal con t-SNE",
         ],
     )
 
@@ -234,11 +234,6 @@ st.pyplot(fig)
 ############################################################################################
 
 
-
-# Verificar los nombres de las columnas
-st.write("### Columnas en el archivo de datos:")
-st.write(data.columns)
-
 # Preprocesamiento de datos
 def preprocess_data(data):
     # Asegúrate de que los nombres de las columnas coincidan exactamente con los del archivo
@@ -292,7 +287,7 @@ X_tsne = tsne.fit_transform(X_scaled)
 plot_dimension_reduction(X_pca, X_tsne, y, 'PCA - Datos Originales', 't-SNE - Datos Originales')
 
 # Entrenar y evaluar modelos con SVM
-st.write("## Modelos de Machine Learning")
+st.write("## Modelos Ajustados")
 
 # SVM con datos originales
 st.write("### SVM con Datos Originales")
