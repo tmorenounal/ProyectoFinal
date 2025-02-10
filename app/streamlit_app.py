@@ -301,7 +301,7 @@ def load_model():
             data = pickle.load(f)  # Carga el diccionario con el modelo y scaler
 
         if isinstance(data, dict):
-            model = data.get("model", None)  # Extraer modelo
+            model = data.get("modelo", None)  # Extraer modelo
             scaler = data.get("scaler", None)  # Extraer scaler
             if model is None or scaler is None:
                 raise ValueError("El archivo no contiene el modelo o el scaler.")
