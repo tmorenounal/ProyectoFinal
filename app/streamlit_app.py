@@ -212,7 +212,7 @@ model_pca = Sequential([
     Dense(144, activation='relu'),
     Dense(1, activation='sigmoid')
 ])
-optimizer = SGD(learning_rate=0.0329)
+optimizer = SGD(lr=0.0329)
 model_pca.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
 model_pca.fit(X_train_pca, y_train, epochs=43, batch_size=72, verbose=1)
 st.write("### Evaluación Red Neuronal con PCA")
