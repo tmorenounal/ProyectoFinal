@@ -9,12 +9,11 @@ from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
-from sklearn.metrics import confusion_matrix, classification_report
 
-# Cargar los datos
+# Cargar datos con cache
 @st.cache_data
 def load_data():
     try:
@@ -37,7 +36,7 @@ pesos = {
     'Edad': 0.2, 'Leptina': 0.05, 'FTO_Aditivo': 0.05
 }
 
-# Verificar la existencia de columnas necesarias
+# Verificar existencia de columnas
 missing_columns = [col for col in pesos.keys() if col not in data.columns]
 if missing_columns:
     st.error(f"Faltan las siguientes columnas: {missing_columns}")
@@ -46,194 +45,85 @@ if missing_columns:
 # Calcular el índice de riesgo cardiovascular
 data['Riesgo_Cardiovascular'] = data[list(pesos.keys())].mul(pesos).sum(axis=1)
 
-data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > data['Riesgo_Cardiovascular'].median()).astype(int)
-# Calcular el índice de riesgo cardiovascular
-data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
-
-# Calcular el índice de riesgo cardiovascular
-data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
-
-# Calcular el índice de riesgo cardiovascular
-data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
-
-# Definir un umbral fijo basado en una fracción del máximo
-umbral = data['Riesgo_Cardiovascular'].max() * 0.5  # Ajustar según necesidad
-
-# Crear variable binaria de riesgo cardiovascular
+# Definir umbral basado en el 50% del valor máximo
+umbral = data['Riesgo_Cardiovascular'].max() * 0.5
 data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > umbral).astype(int)
-
-
 
 # Mostrar datos
 st.title('Análisis de Enfermedades Cardiovasculares en la Población Indígena Xavante de Brasil')
-st.write("""
-La siguiente base de datos pertenece a una población de indígenas Xavantes de Brasil, 
-la cual cuenta con variables importantes para determinar enfermedades cardiovasculares en la población.  
-La base de datos incluye las siguientes variables:
-
-- **Sexo**: Género de los individuos (hombre o mujer).
-- **Edad**: Edad en años.
-- **Leptina**: Nivel de leptina, una hormona relacionada con la regulación del apetito y el metabolismo.
-- **Grasa**: Porcentaje de grasa corporal.
-- **IMC**: Índice de Masa Corporal, una medida de la relación entre peso y altura.
-- **BAI**: Índice de Adiposidad Corporal, una medida alternativa al IMC.
-- **Cintura**: Circunferencia de la cintura en centímetros.
-- **Cadera**: Circunferencia de la cadera en centímetros.
-- **CVLDL**: Colesterol de lipoproteínas de muy baja densidad.
-- **Triglic**: Nivel de triglicéridos en sangre.
-- **CTOTAL**: Colesterol total.
-- **CLDL**: Colesterol de lipoproteínas de baja densidad (colesterol "malo").
-- **CHDL**: Colesterol de lipoproteínas de alta densidad (colesterol "bueno").
-- **FTO_Aditivo**: Variante genética asociada con la obesidad y el riesgo cardiovascular.
-""")
-
 st.write("### Vista previa de los datos")
 st.dataframe(data.head())
-st.write("### Información de los datos")
-st.dataframe(data.describe())
-# Capturar la información del DataFrame
-buffer = io.StringIO()
-data.info(buf=buffer)  # Captura la salida de data.info()
-info_str = buffer.getvalue()  # Convierte el buffer en string
 
-st.write("### Información del DataFrame")
-st.text(info_str)  # Muestra el contenido de info() en formato de texto
-
-st.write("""
-### Variable Objetivo: Riesgo Cardiovascular
-
-La variable objetivo de este estudio es el **Riesgo Cardiovascular**, que se determina en función de los siguientes criterios clínicos y umbrales establecidos:
-
-- **Colesterol Total (CTOTAL)**: Alto riesgo si **CTOTAL > 200 mg/dL**.
-- **Triglicéridos (Triglic)**: Alto riesgo si **Triglic > 150 mg/dL**.
-- **Colesterol LDL (CLDL)**: Alto riesgo si **CLDL > 130 mg/dL**.
-- **Colesterol HDL (CHDL)**: **Bajo riesgo** si **CHDL < 40 mg/dL (hombres)** o **< 50 mg/dL (mujeres)**.
-- **Índice de Masa Corporal (IMC)**: Alto riesgo si **IMC > 30** (obesidad).
-- **Circunferencia de Cintura**: Alto riesgo si **Cintura > 102 cm (hombres)** o **> 88 cm (mujeres)**.
-- **Relación Cintura-Cadera**: Alto riesgo si **Relación > 0.9 (hombres)** o **> 0.85 (mujeres)**.
-
-#### Definición de la Variable de Interés:
-- **0 (Bajo riesgo):** El individuo **no cumple con ninguno** de los criterios de alto riesgo.
-- **1 (Alto riesgo):** El individuo **cumple con al menos uno** de los criterios de alto riesgo mencionados anteriormente.
-
-Esta variable se calcula automáticamente en el análisis utilizando los umbrales clínicos establecidos.
-""")
-
-st.write(f"Se ha utilizado un umbral de **{umbral:.2f}** basado en el 50% del valor máximo del índice.")
-
-# Mostrar el balance de clases
+# Balance de clases
 st.write("#### Balance de Clases en la Variable Objetivo")
 st.write(data['Riesgo_Cardiovascular_Binario'].value_counts())
 
-st.write("### Histograma de la Distribución del Riesgo Cardiovascular")
-
-# Crear el histograma
+# Gráfica del riesgo cardiovascular
 fig, ax = plt.subplots()
 sns.histplot(data['Riesgo_Cardiovascular'], bins=30, kde=True, ax=ax, color='blue')
 ax.set_title('Distribución del Índice de Riesgo Cardiovascular')
 ax.set_xlabel('Riesgo Cardiovascular')
 ax.set_ylabel('Frecuencia')
-
-# Mostrar la gráfica en Streamlit
 st.pyplot(fig)
 
+# Separar datos para entrenamiento
+X = data[list(pesos.keys())]
+y = data['Riesgo_Cardiovascular_Binario']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-st.write("### Distribución de Variables Numéricas")
-
-# Obtener solo las columnas numéricas
-numerical_columns = data.select_dtypes(include=['number']).columns.tolist()
-
-# Validar que hay columnas numéricas antes de continuar
-if not numerical_columns:
-    st.error("No se encontraron variables numéricas en el dataset.")
-    st.stop()
-
-# Seleccionar la variable a visualizar
-selected_variable = st.selectbox("Selecciona una variable numérica:", numerical_columns)
-
-# Botón para mostrar la gráfica
-if st.button(f"Ver distribución de {selected_variable}"):
-    fig, ax = plt.subplots()
-    sns.histplot(data[selected_variable], bins=30, kde=True, ax=ax)
-    ax.set_title(f'Distribución de {selected_variable}')
-    ax.set_xlabel(selected_variable)
-    ax.set_ylabel('Frecuencia')
-    st.pyplot(fig)
-
-# Matriz de correlación
-st.write("#### Matriz de Correlación")
-fig, ax = plt.subplots(figsize=(12, 8))
-sns.heatmap(data.corr(), annot=True, cmap='coolwarm', ax=ax)
-ax.set_title('Matriz de Correlación')
-st.pyplot(fig)
-
-################################
+# Entrenar modelo SVM
+svm_model = SVC(kernel='linear', random_state=42)
+svm_model.fit(X_train, y_train)
+y_pred_svm = svm_model.predict(X_test)
 
 # Evaluación del Modelo SVM
 st.write("### Evaluación del Modelo SVM")
-
-# Matriz de confusión para SVM
 cm_svm = confusion_matrix(y_test, y_pred_svm)
 fig, ax = plt.subplots()
-sns.heatmap(cm_svm, annot=True, fmt='d', cmap='Blues', xticklabels=["Bajo Riesgo", "Alto Riesgo"], yticklabels=["Bajo Riesgo", "Alto Riesgo"])
+sns.heatmap(cm_svm, annot=True, fmt='d', cmap='Blues', xticklabels=["Bajo", "Alto"], yticklabels=["Bajo", "Alto"])
 ax.set_title("Matriz de Confusión - SVM")
 ax.set_xlabel("Predicho")
 ax.set_ylabel("Real")
 st.pyplot(fig)
 
-# Reporte de clasificación para SVM
 st.text("**Reporte de Clasificación - SVM**")
 st.text(classification_report(y_test, y_pred_svm))
 
-# Explicación de Evaluación de SVM
-st.write("""
-**Interpretación de la Evaluación del SVM:**
-- La **matriz de confusión** muestra cuántas predicciones fueron correctas o incorrectas.
-- El **reporte de clasificación** indica métricas como precisión, recall y F1-score.
-- Un **F1-score alto** indica un buen balance entre precisión y recall.
-""")
+# Modelo de Red Neuronal
+nn_model = Sequential([
+    Dense(16, activation='relu', input_shape=(X_train.shape[1],)),
+    Dense(8, activation='relu'),
+    Dense(1, activation='sigmoid')
+])
+nn_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-# Evaluación del Modelo de Red Neuronal
+# Entrenar el modelo
+history = nn_model.fit(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2, verbose=0)
+
+# Predicciones
+y_pred_nn = (nn_model.predict(X_test) > 0.5).astype(int)
+
+# Evaluación de la Red Neuronal
 st.write("### Evaluación del Modelo de Red Neuronal")
-
-# Matriz de confusión para la red neuronal
 cm_nn = confusion_matrix(y_test, y_pred_nn)
 fig, ax = plt.subplots()
-sns.heatmap(cm_nn, annot=True, fmt='d', cmap='Greens', xticklabels=["Bajo Riesgo", "Alto Riesgo"], yticklabels=["Bajo Riesgo", "Alto Riesgo"])
+sns.heatmap(cm_nn, annot=True, fmt='d', cmap='Greens', xticklabels=["Bajo", "Alto"], yticklabels=["Bajo", "Alto"])
 ax.set_title("Matriz de Confusión - Red Neuronal")
 ax.set_xlabel("Predicho")
 ax.set_ylabel("Real")
 st.pyplot(fig)
 
-# Reporte de clasificación para la red neuronal
 st.text("**Reporte de Clasificación - Red Neuronal**")
 st.text(classification_report(y_test, y_pred_nn))
 
-# Explicación de Evaluación de la Red Neuronal
-st.write("""
-**Interpretación de la Evaluación de la Red Neuronal:**
-- La **matriz de confusión** muestra la cantidad de aciertos y errores del modelo.
-- El **reporte de clasificación** detalla la precisión de las predicciones.
-- Un **F1-score alto** sugiere que el modelo clasifica correctamente la mayoría de los casos.
-""")
-
-# Gráfica de la evolución del entrenamiento de la red neuronal
+# Evolución del entrenamiento
 st.write("### Evolución del Entrenamiento de la Red Neuronal")
-history = nn_model.fit(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2, verbose=0)
-
 fig, ax = plt.subplots()
-ax.plot(history.history['accuracy'], label="Precisión en Entrenamiento")
-ax.plot(history.history['val_accuracy'], label="Precisión en Validación", linestyle="dashed")
-ax.set_title("Evolución de la Precisión")
+ax.plot(history.history['accuracy'], label="Entrenamiento")
+ax.plot(history.history['val_accuracy'], label="Validación", linestyle="dashed")
+ax.set_title("Precisión del Modelo")
 ax.set_xlabel("Épocas")
 ax.set_ylabel("Precisión")
 ax.legend()
 st.pyplot(fig)
 
-st.write("""
-**Interpretación de la Evolución del Entrenamiento:**
-- La línea **sólida** representa la precisión en los datos de entrenamiento.
-- La línea **discontinua** representa la precisión en datos de validación.
-- Si ambas líneas aumentan y se estabilizan, el modelo generaliza bien los datos.
-- Si la validación cae mientras el entrenamiento mejora, podría haber **sobreajuste**.
-""")
