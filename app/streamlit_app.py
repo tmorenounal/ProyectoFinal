@@ -14,6 +14,8 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from sklearn.metrics import confusion_matrix, classification_report
 from tensorflow.keras.optimizers import SGD
+from sklearn.metrics import roc_curve, auc
+
 
 # Cargar los datos
 @st.cache_data
