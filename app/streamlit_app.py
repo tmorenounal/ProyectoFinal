@@ -283,15 +283,27 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 
 ####################################################
 
+st.write"### Predicción")
 
+def load_model():
+    """Carga el modelo desde un archivo comprimido y verifica su integridad."""
+    try:
+        with gzip.open('best_model.pkl.gz', 'rb') as f:
+            model = pickle.load(f)
+        return model
+    except Exception as e:
+        st.error(f"Error al cargar el modelo: {e}")
+        return None
 
+def load_scaler():
+    """Carga el escalador utilizado en el entrenamiento, si existe."""
+    try:
+        with gzip.open('scaler.pkl.gz', 'rb') as f:
+            scaler = pickle.load(f)
+        return scaler
+    except Exception:
+        return None
 
-def load_model_and_scaler():
-    with open('best_model.pkl.gz', 'rb') as model_file:
-        model = pickle.load(model_file)
-    with open('scaler.pkl', 'rb') as scaler_file:
-        scaler = pickle.load(scaler_file)
-    return model, scaler
 
 def user_input():
     sexo = st.selectbox("Sexo", ["Femenino", "Masculino"])
