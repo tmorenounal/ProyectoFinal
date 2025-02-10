@@ -172,7 +172,6 @@ st.pyplot(fig)
 
 ############################################################################################
 
-st.write("### Modelos")
 
 def preprocess_data(data):
     X = data.drop(columns=['IID', 'Riesgo_Cardiovascular', 'Riesgo_Cardiovascular_Binario'])
