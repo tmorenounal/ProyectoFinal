@@ -18,8 +18,6 @@ from sklearn.metrics import confusion_matrix, classification_report
 from tensorflow.keras.optimizers import SGD
 from sklearn.metrics import roc_curve, auc
 
-# Configuración de la página
-st.set_page_config(page_title="Análisis Cardiovascular", page_icon="❤️", layout="wide")
 
 # Menú de navegación en el sidebar
 st.sidebar.title("Navegación")
@@ -49,7 +47,7 @@ with st.sidebar.expander(" Modelos Ajustados", expanded=True):
     )
 
 # Submenú para Predicciones
-with st.sidebar.expander("🔮 Predicciones", expanded=True):
+with st.sidebar.expander("Predicciones", expanded=True):
     section_predicciones = st.radio(
         "Selecciona una sección:",
         [
