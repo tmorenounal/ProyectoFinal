@@ -142,7 +142,6 @@ ax.set_ylabel('Frecuencia')
 # Mostrar la gráfica en Streamlit
 st.pyplot(fig)
 
-
 st.write("### Distribución de Variables Numéricas")
 
 # Obtener solo las columnas numéricas
@@ -153,17 +152,36 @@ if not numerical_columns:
     st.error("No se encontraron variables numéricas en el dataset.")
     st.stop()
 
-# Seleccionar la variable a visualizar
-selected_variable = st.selectbox("Selecciona una variable numérica:", numerical_columns)
+# Seleccionar las variables a visualizar
+selected_variables = st.multiselect(
+    "Selecciona las variables numéricas que deseas visualizar:",
+    numerical_columns,
+    default=numerical_columns[:2]  # Mostrar las primeras 2 variables por defecto
+)
 
-# Botón para mostrar la gráfica
-if st.button(f"Ver distribución de {selected_variable}"):
-    fig, ax = plt.subplots()
-    sns.histplot(data[selected_variable], bins=30, kde=True, ax=ax)
-    ax.set_title(f'Distribución de {selected_variable}')
-    ax.set_xlabel(selected_variable)
-    ax.set_ylabel('Frecuencia')
-    st.pyplot(fig)
+# Verificar si se seleccionaron variables
+if not selected_variables:
+    st.warning("Por favor, selecciona al menos una variable numérica.")
+    st.stop()
+
+# Organizar las gráficas en un mosaico
+num_columns = 2  # Número de columnas en el mosaico
+num_rows = (len(selected_variables) + num_columns - 1) // num_columns  # Calcular el número de filas necesarias
+
+# Crear un mosaico de gráficas
+for i in range(num_rows):
+    cols = st.columns(num_columns)  # Crear una fila con el número de columnas especificado
+    for j in range(num_columns):
+        idx = i * num_columns + j  # Calcular el índice de la variable actual
+        if idx < len(selected_variables):  # Verificar que el índice esté dentro del rango
+            variable = selected_variables[idx]
+            with cols[j]:  # Usar la columna correspondiente
+                fig, ax = plt.subplots(figsize=(6, 4))  # Tamaño más pequeño para las gráficas
+                sns.histplot(data[variable], bins=30, kde=True, ax=ax)
+                ax.set_title(f'Distribución de {variable}')
+                ax.set_xlabel(variable)
+                ax.set_ylabel('Frecuencia')
+                st.pyplot(fig)
 
 # Matriz de correlación
 st.write("#### Matriz de Correlación")
