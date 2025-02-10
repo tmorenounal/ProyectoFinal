@@ -172,6 +172,7 @@ st.pyplot(fig)
 
 ############################################################################################
 
+st.write("### Modelos")
 
 def preprocess_data(data):
     X = data.drop(columns=['IID', 'Riesgo_Cardiovascular', 'Riesgo_Cardiovascular_Binario'])
@@ -279,3 +280,9 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
     st.write(f"Matriz de Confusión (Red Neuronal con {name}):")
     st.write(confusion_matrix(y_test, y_pred_nn))
     plot_roc_curve(y_test, y_pred_proba_nn, f'Curva ROC - Red Neuronal ({name})')
+
+####################################################
+
+st.write("### Predicción")
+
+
