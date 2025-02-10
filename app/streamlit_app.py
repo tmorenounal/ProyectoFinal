@@ -295,20 +295,25 @@ st.title("🔬 Predicción de Riesgo Cardiovascular")
 # Cargar modelo desde archivo comprimido
 @st.cache_resource
 def load_model():
-    """Carga el modelo desde un archivo comprimido."""
+    """Carga el modelo y el scaler desde un archivo comprimido."""
     try:
         with gzip.open("best_model.pkl.gz", "rb") as f:
-            model = pickle.load(f)  # Carga solo el modelo
-        return model
+            data = pickle.load(f)  # Carga el diccionario con el modelo y scaler
+
+        if isinstance(data, dict):
+            model = data.get("model", None)  # Extraer modelo
+            scaler = data.get("scaler", None)  # Extraer scaler
+            if model is None or scaler is None:
+                raise ValueError("El archivo no contiene el modelo o el scaler.")
+            return model, scaler
+        else:
+            raise ValueError("El archivo no tiene el formato esperado.")
     except Exception as e:
         st.error(f"Error al cargar el modelo: {e}")
-        return None
+        return None, None
 
-# Inicializar el scaler con valores estándar (debe coincidir con los usados en el entrenamiento)
-scaler = StandardScaler()
-
-# Cargar el modelo
-model = load_model()
+# Cargar el modelo y el scaler
+model, scaler = load_model()
 
 # Función para ingresar datos del usuario con valores predeterminados
 def user_input():
@@ -339,28 +344,19 @@ input_data = user_input()
 
 # Botón para hacer la predicción
 if st.button("🔍 Realizar Predicción"):
-    if model is not None:
+    if model is not None and scaler is not None:
         try:
-            # Escalar los datos antes de la predicción (se asume que el scaler se ajustó antes de guardar el modelo)
-            input_data_scaled = scaler.fit_transform(input_data)  # Ajusta el escalador solo con los datos ingresados
+            # Escalar los datos con el scaler cargado desde el modelo
+            input_data_scaled = scaler.transform(input_data)
 
-            # Verificar la forma esperada del modelo
-            expected_shape = model.input_shape  
-            if len(expected_shape) == 2 and expected_shape[1] == 14:
-                prediction = model.predict(input_data_scaled)
-            elif len(expected_shape) == 3 and expected_shape[1:] == (14, 1):
-                input_data_scaled = input_data_scaled.reshape(1, 14, 1)
-                prediction = model.predict(input_data_scaled)
-            else:
-                st.error(f"Error: la forma del modelo no coincide con los datos. Esperado: {expected_shape}, pero se obtuvo: {input_data_scaled.shape}")
-                prediction = None
+            # Realizar la predicción
+            prediction = model.predict(input_data_scaled)
 
-            if prediction is not None:
-                prediction_label = "🔴 Alto Riesgo" if prediction[0] >= 0.5 else "🟢 Bajo Riesgo"
-                st.subheader("Resultado de la Predicción:")
-                st.markdown(f"## {prediction_label}")
+            prediction_label = "🔴 Alto Riesgo" if prediction[0] >= 0.5 else "🟢 Bajo Riesgo"
+            st.subheader("Resultado de la Predicción:")
+            st.markdown(f"## {prediction_label}")
 
         except Exception as e:
             st.error(f"Error en la predicción: {e}")
     else:
-        st.error("No se pudo cargar el modelo.")
+        st.error("No se pudo cargar el modelo y/o el scaler.")
