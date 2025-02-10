@@ -283,12 +283,8 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
     plot_roc_curve(y_test, y_pred_proba_nn, f'Curva ROC - Red Neuronal ({name})')
 
 ####################################################
-import streamlit as st
-import numpy as np
-import pickle
-import gzip
 
-st.title("Predicción de Riesgo Cardiovascular")
+st.title("🔬 Predicción de Riesgo Cardiovascular")
 
 # Cargar modelo desde archivo comprimido
 @st.cache_resource
@@ -305,22 +301,22 @@ def load_model():
 # Cargar el modelo y el scaler
 model, scaler = load_model()
 
-# Función para ingresar datos del usuario
+# Función para ingresar datos del usuario con valores predeterminados
 def user_input():
-    sexo = st.selectbox("Sexo", ["Femenino", "Masculino"])
-    edad = st.number_input("Edad", min_value=18, max_value=100, step=1)
-    leptina = st.number_input("Leptina", min_value=0.0, step=0.1)
-    grasa = st.number_input("Grasa", min_value=0.0, step=0.1)
-    imc = st.number_input("IMC", min_value=10.0, step=0.1)
-    bai = st.number_input("BAI", min_value=0.0, step=0.1)
-    cintura = st.number_input("Cintura", min_value=30.0, step=0.1)
-    cadera = st.number_input("Cadera", min_value=30.0, step=0.1)
-    cvldl = st.number_input("CVLDL", min_value=0.0, step=0.1)
-    triglic = st.number_input("Triglicéridos", min_value=0.0, step=0.1)
-    ctotal = st.number_input("Colesterol Total", min_value=0.0, step=0.1)
-    cldl = st.number_input("CLDL", min_value=0.0, step=0.1)
-    chdl = st.number_input("CHDL", min_value=0.0, step=0.1)
-    fto_aditivo = st.number_input("FTO Aditivo", min_value=0.0, step=0.1)
+    sexo = st.selectbox("Sexo", ["Femenino", "Masculino"], index=1)  # Predeterminado: Masculino
+    edad = st.number_input("Edad", min_value=18, max_value=100, step=1, value=45)  # Predeterminado: 45 años
+    leptina = st.number_input("Leptina", min_value=0.0, step=0.1, value=15.2)
+    grasa = st.number_input("Grasa (%)", min_value=0.0, step=0.1, value=22.5)
+    imc = st.number_input("IMC", min_value=10.0, step=0.1, value=27.3)
+    bai = st.number_input("BAI", min_value=0.0, step=0.1, value=25.1)
+    cintura = st.number_input("Cintura (cm)", min_value=30.0, step=0.1, value=92.4)
+    cadera = st.number_input("Cadera (cm)", min_value=30.0, step=0.1, value=100.2)
+    cvldl = st.number_input("CVLDL", min_value=0.0, step=0.1, value=24.0)
+    triglic = st.number_input("Triglicéridos", min_value=0.0, step=0.1, value=130.5)
+    ctotal = st.number_input("Colesterol Total", min_value=0.0, step=0.1, value=210.8)
+    cldl = st.number_input("CLDL", min_value=0.0, step=0.1, value=140.3)
+    chdl = st.number_input("CHDL", min_value=0.0, step=0.1, value=48.2)
+    fto_aditivo = st.number_input("FTO Aditivo", min_value=0.0, step=0.1, value=1.5)
     
     sexo_binario = 1 if sexo == "Masculino" else 0  # Codificar Sexo
     
@@ -333,7 +329,7 @@ def user_input():
 input_data = user_input()
 
 # Botón para hacer la predicción
-if st.button("Realizar Predicción"):
+if st.button("🔍 Realizar Predicción"):
     if model is not None and scaler is not None:
         try:
             # Escalar los datos antes de la predicción
