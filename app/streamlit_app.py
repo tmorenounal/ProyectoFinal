@@ -106,11 +106,12 @@ umbral = data['Riesgo_Cardiovascular'].max() * 0.5  # Ajustar según necesidad
 # Crear variable binaria de riesgo cardiovascular
 data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > umbral).astype(int)
 
-# Normalización de los datos
+# Normalización de variables con escalas muy grandes
+cols_to_scale = ["Leptina", "Triglic", "CTOTAL", "CLDL", "BAI"]
 scaler = StandardScaler()
-columns_to_normalize = list(pesos.keys())  # Columnas a normalizar
-data_normalized = data.copy()
-data_normalized[columns_to_normalize] = scaler.fit_transform(data[columns_to_normalize])
+
+# Aplicar StandardScaler a las columnas seleccionadas
+data[cols_to_scale] = scaler.fit_transform(data[cols_to_scale])
 
 
 # Mostrar datos
@@ -136,11 +137,12 @@ La base de datos incluye las siguientes variables:
 - **FTO_Aditivo**: Variante genética asociada con la obesidad y el riesgo cardiovascular.
 """)
 
-st.write("### Vista previa de los datos normalizados")
-st.dataframe(data_normalized.head())
+st.write("### Vista previa de los datos")
+st.dataframe(data.head(5))
 
-st.write("### Información de los datos normalizados")
-st.dataframe(data_normalized.describe())
+# Mostrar estadísticas descriptivas de los datos normalizados
+st.write("### Información de los datos")
+st.write(data.describe())
 
 # Capturar la información del DataFrame normalizado
 buffer = io.StringIO()
