@@ -171,7 +171,7 @@ ax.set_title('Matriz de Correlación')
 st.pyplot(fig)
 
 ############################################################################################
-
+st.write("###Modelos")
 
 def preprocess_data(data):
     X = data.drop(columns=['IID', 'Riesgo_Cardiovascular', 'Riesgo_Cardiovascular_Binario'])
@@ -282,7 +282,6 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 
 ####################################################
 
-st.write("### Predicción")
 
 def load_model():
     """Carga el modelo desde un archivo comprimido y verifica su integridad."""
