@@ -12,6 +12,7 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
+from sklearn.metrics import confusion_matrix, classification_report
 
 # Cargar los datos
 @st.cache_data
