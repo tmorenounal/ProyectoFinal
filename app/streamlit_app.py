@@ -445,7 +445,7 @@ def load_model():
 # Cargar el modelo y el scaler
 model, scaler = load_model()
 
-# Función para ingresar datos del usuario con valores predeterminados y escalas ajustadas
+# Función para ingresar datos del usuario con valores predeterminados y escalas correctas
 def user_input():
     st.sidebar.header("Ingresar Datos del Paciente")
 
