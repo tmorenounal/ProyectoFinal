@@ -285,6 +285,11 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 ####################################################
 
 
+import streamlit as st
+import pickle
+import gzip
+import numpy as np
+
 def load_model():
     """Carga el modelo desde un archivo comprimido y verifica su integridad."""
     try:
@@ -295,18 +300,7 @@ def load_model():
         st.error(f"Error al cargar el modelo: {e}")
         return None
 
-def load_scaler():
-    """Carga el escalador utilizado en el entrenamiento, si existe."""
-    try:
-        with gzip.open('scaler.pkl.gz', 'rb') as f:
-            scaler = pickle.load(f)
-        return scaler
-    except Exception as e:
-        st.warning(f"No se encontró el escalador: {e}")
-        return None
-
 def user_input():
-    """Captura los datos de entrada del usuario."""
     sexo = st.selectbox("Sexo", ["Femenino", "Masculino"])
     edad = st.number_input("Edad", min_value=18, max_value=100, step=1)
     leptina = st.number_input("Leptina", min_value=0.0, step=0.1)
@@ -328,21 +322,13 @@ def user_input():
                       cvldl, triglic, ctotal, cldl, chdl, fto_aditivo]])
     return data
 
-# Título de la aplicación
 st.title("Predicción de Riesgo Cardiovascular")
-
-# Cargar modelo y escalador
 model = load_model()
-scaler = load_scaler()
 
-# Obtener datos del usuario
-input_data = user_input()
-
-# Verificar si el modelo y el escalador se cargaron correctamente
-if model is not None and scaler is not None:
-    scaled_data = scaler.transform(input_data)  # Normalizar datos
-    prediction = model.predict(scaled_data)  # Realizar predicción
+if model:
+    input_data = user_input()
+    prediction = model.predict(input_data)
     prediction_label = "Alto Riesgo" if prediction[0] == 1 else "Bajo Riesgo"
     st.write(f"### Resultado de la Predicción: {prediction_label}")
 else:
-    st.error("No se puede realizar la predicción porque el modelo o el escalador no se cargaron correctamente.")
+    st.error("No se pudo cargar el modelo. Verifica que el archivo 'best_model.pkl.gz' esté en el directorio correcto.")
