@@ -284,27 +284,36 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 
 ####################################################
 
+import streamlit as st
+import numpy as np
+import pickle
+import gzip
+from sklearn.preprocessing import StandardScaler
+
 st.title("🔬 Predicción de Riesgo Cardiovascular")
 
 # Cargar modelo desde archivo comprimido
 @st.cache_resource
 def load_model():
-    """Carga el modelo y el scaler desde un archivo comprimido."""
+    """Carga el modelo desde un archivo comprimido."""
     try:
         with gzip.open("best_model.pkl.gz", "rb") as f:
-            model, scaler = pickle.load(f)  # Se asume que se guardó junto con el scaler
-        return model, scaler
+            model = pickle.load(f)  # Carga solo el modelo
+        return model
     except Exception as e:
         st.error(f"Error al cargar el modelo: {e}")
-        return None, None
+        return None
 
-# Cargar el modelo y el scaler
-model, scaler = load_model()
+# Inicializar el scaler con valores estándar (debe coincidir con los usados en el entrenamiento)
+scaler = StandardScaler()
+
+# Cargar el modelo
+model = load_model()
 
 # Función para ingresar datos del usuario con valores predeterminados
 def user_input():
     sexo = st.selectbox("Sexo", ["Femenino", "Masculino"], index=1)  # Predeterminado: Masculino
-    edad = st.number_input("Edad", min_value=18, max_value=100, step=1, value=45)  # Predeterminado: 45 años
+    edad = st.number_input("Edad", min_value=18, max_value=100, step=1, value=45)
     leptina = st.number_input("Leptina", min_value=0.0, step=0.1, value=15.2)
     grasa = st.number_input("Grasa (%)", min_value=0.0, step=0.1, value=22.5)
     imc = st.number_input("IMC", min_value=10.0, step=0.1, value=27.3)
@@ -330,10 +339,10 @@ input_data = user_input()
 
 # Botón para hacer la predicción
 if st.button("🔍 Realizar Predicción"):
-    if model is not None and scaler is not None:
+    if model is not None:
         try:
-            # Escalar los datos antes de la predicción
-            input_data_scaled = scaler.transform(input_data)
+            # Escalar los datos antes de la predicción (se asume que el scaler se ajustó antes de guardar el modelo)
+            input_data_scaled = scaler.fit_transform(input_data)  # Ajusta el escalador solo con los datos ingresados
 
             # Verificar la forma esperada del modelo
             expected_shape = model.input_shape  
