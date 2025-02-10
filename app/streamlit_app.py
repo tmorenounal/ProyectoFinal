@@ -284,14 +284,13 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 
 ####################################################
 
-
 import streamlit as st
 import pickle
 import gzip
 import numpy as np
 
 def load_model():
-    """Carga el modelo desde un archivo comprimido y verifica su integridad."""
+    """Carga el modelo desde un archivo comprimido."""
     try:
         with gzip.open('best_model.pkl.gz', 'rb') as f:
             model = pickle.load(f)
@@ -300,7 +299,17 @@ def load_model():
         st.error(f"Error al cargar el modelo: {e}")
         return None
 
+def load_scaler():
+    """Carga el escalador si está disponible."""
+    try:
+        with gzip.open('scaler.pkl.gz', 'rb') as f:
+            scaler = pickle.load(f)
+        return scaler
+    except Exception:
+        return None  # Si no hay escalador, seguimos adelante.
+
 def user_input():
+    """Captura los datos del usuario y los convierte a un array numpy."""
     sexo = st.selectbox("Sexo", ["Femenino", "Masculino"])
     edad = st.number_input("Edad", min_value=18, max_value=100, step=1)
     leptina = st.number_input("Leptina", min_value=0.0, step=0.1)
@@ -320,15 +329,30 @@ def user_input():
     
     data = np.array([[sexo_binario, edad, leptina, grasa, imc, bai, cintura, cadera, 
                       cvldl, triglic, ctotal, cldl, chdl, fto_aditivo]])
+    
     return data
 
 st.title("Predicción de Riesgo Cardiovascular")
+
+# Cargar modelo y escalador
 model = load_model()
+scaler = load_scaler()
 
 if model:
     input_data = user_input()
-    prediction = model.predict(input_data)
-    prediction_label = "Alto Riesgo" if prediction[0] == 1 else "Bajo Riesgo"
-    st.write(f"### Resultado de la Predicción: {prediction_label}")
+
+    # Si hay un escalador, transformamos los datos
+    if scaler:
+        input_data = scaler.transform(input_data)
+
+    # Verificar la forma del input antes de predecir
+    st.write(f"Dimensión de los datos de entrada: {input_data.shape}")
+
+    try:
+        prediction = model.predict(input_data)
+        prediction_label = "Alto Riesgo" if prediction[0] == 1 else "Bajo Riesgo"
+        st.write(f"### Resultado de la Predicción: {prediction_label}")
+    except ValueError as e:
+        st.error(f"Error en la predicción: {e}")
 else:
     st.error("No se pudo cargar el modelo. Verifica que el archivo 'best_model.pkl.gz' esté en el directorio correcto.")
