@@ -283,10 +283,11 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 
 ####################################################
 
-st.write("### Predicción")
+
+
 
 def load_model_and_scaler():
-    with open('best_model.pkl', 'rb') as model_file:
+    with open('best_model.pkl.gz', 'rb') as model_file:
         model = pickle.load(model_file)
     with open('scaler.pkl', 'rb') as scaler_file:
         scaler = pickle.load(scaler_file)
