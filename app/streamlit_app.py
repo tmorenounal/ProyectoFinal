@@ -167,3 +167,60 @@ sns.heatmap(data.corr(), annot=True, cmap='coolwarm', ax=ax)
 ax.set_title('Matriz de Correlación')
 st.pyplot(fig)
 
+############################################################################################
+
+# Preparar los datos para los modelos
+features = list(pesos.keys())
+X = data[features]
+y = data['Riesgo_Cardiovascular_Binario']
+X_scaled = StandardScaler().fit_transform(X)
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+# Modelo SVM
+svm_model = SVC(kernel='linear')
+svm_model.fit(X_train, y_train)
+y_pred_svm = svm_model.predict(X_test)
+
+# Modelo de Red Neuronal
+nn_model = Sequential([
+    Dense(16, activation='relu', input_shape=(X_train.shape[1],)),
+    Dense(8, activation='relu'),
+    Dense(1, activation='sigmoid')
+])
+nn_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+nn_model.fit(X_train, y_train, epochs=50, batch_size=10, verbose=0)
+y_pred_nn = (nn_model.predict(X_test) > 0.5).astype(int).flatten()
+
+# Reducción de dimensionalidad con PCA
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+
+# Reducción de dimensionalidad con t-SNE
+tsne = TSNE(n_components=2, random_state=42)
+X_tsne = tsne.fit_transform(X_scaled)
+
+# Evaluación de modelos
+def evaluate_model(y_true, y_pred, model_name):
+    st.write(f"### Evaluación del modelo: {model_name}")
+    st.write(f"Accuracy: {accuracy_score(y_true, y_pred):.4f}")
+    st.write("Matriz de Confusión:")
+    st.text(confusion_matrix(y_true, y_pred))
+    st.write("Reporte de Clasificación:")
+    st.text(classification_report(y_true, y_pred))
+
+evaluate_model(y_test, y_pred_svm, "SVM")
+evaluate_model(y_test, y_pred_nn, "Red Neuronal")
+
+# Visualización de PCA y t-SNE
+def plot_dim_reduction(X_transformed, y, title):
+    df_vis = pd.DataFrame(X_transformed, columns=['Componente 1', 'Componente 2'])
+    df_vis['Clase'] = y.values
+    
+    plt.figure(figsize=(8, 6))
+    sns.scatterplot(x='Componente 1', y='Componente 2', hue='Clase', data=df_vis, palette='coolwarm', alpha=0.7)
+    plt.title(title)
+    st.pyplot(plt)
+
+st.write("### Visualización de Reducción de Dimensionalidad")
+plot_dim_reduction(X_pca, y, "PCA")
+plot_dim_reduction(X_tsne, y, "t-SNE")
