@@ -173,17 +173,6 @@ st.pyplot(fig)
 ############################################################################################
 
 
-def load_data():
-    try:
-        data = pd.read_csv('data.csv')
-        if 'Riesgo_Cardiovascular_Binario' not in data.columns:
-            st.error("Error: La columna 'Riesgo_Cardiovascular_Binario' no está en el conjunto de datos.")
-            return None
-        return data
-    except Exception as e:
-        st.error(f"Error al cargar los datos: {e}")
-        return None
-
 def preprocess_data(data):
     X = data.drop(columns=[col for col in ['IID', 'Riesgo_Cardiovascular', 'Riesgo_Cardiovascular_Binario'] if col in data.columns], errors='ignore')
     y = data['Riesgo_Cardiovascular_Binario']
