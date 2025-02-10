@@ -18,6 +18,20 @@ from sklearn.metrics import confusion_matrix, classification_report
 from tensorflow.keras.optimizers import SGD
 from sklearn.metrics import roc_curve, auc
 
+# Menú de navegación en el sidebar
+st.sidebar.title("Navegación")
+section = st.sidebar.radio(
+    "Selecciona una sección:",
+    [
+        "Carga de Datos",
+        "Análisis Exploratorio",
+        "Reducción de Dimensionalidad",
+        "Modelos de Machine Learning",
+        "Predicción de Riesgo Cardiovascular",
+    ],
+)
+
+
 
 # Cargar los datos
 @st.cache_data
