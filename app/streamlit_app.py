@@ -174,16 +174,29 @@ st.pyplot(fig)
 
 ############################################################################################
 
+
+
+# Verificar los nombres de las columnas
+st.write("### Columnas en el archivo de datos:")
+st.write(data.columns)
+
 # Preprocesamiento de datos
 def preprocess_data(data):
-    X = data.drop(columns=['IID', 'Riesgo_Ccardiovascular', 'Riesgo_Cardiovascular_Binario'])
+    # Asegúrate de que los nombres de las columnas coincidan exactamente con los del archivo
+    X = data.drop(columns=['IID', 'Riesgo_Cardiovascular', 'Riesgo_Cardiovascular_Binario'])
     y = data['Riesgo_Cardiovascular_Binario']
     X = pd.get_dummies(X, columns=['Sexo'], drop_first=True)
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
     return X_scaled, y
 
-X_scaled, y = preprocess_data(data)
+try:
+    X_scaled, y = preprocess_data(data)
+except KeyError as e:
+    st.error(f"Error: {e}. Verifica los nombres de las columnas en el archivo de datos.")
+    st.stop()
+
+# Dividir los datos en entrenamiento y prueba
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, random_state=42)
 
 # Función para graficar PCA y t-SNE
