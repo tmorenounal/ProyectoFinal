@@ -283,7 +283,7 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 
 ####################################################
 
-st.write"### Predicción")
+st.write("### Predicción")
 
 def load_model():
     """Carga el modelo desde un archivo comprimido y verifica su integridad."""
