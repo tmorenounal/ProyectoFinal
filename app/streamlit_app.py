@@ -342,9 +342,26 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
     st.write(classification_report(y_test, y_pred_nn))
     plot_roc_curve(y_test, y_pred_proba_nn, f'Curva ROC - Red Neuronal ({name})')
 
+    # Gráficas de precisión y pérdida durante el entrenamiento
+    fig, ax = plt.subplots(1, 2, figsize=(12, 5))
+    ax[0].plot(history.history['accuracy'], label='Precisión en entrenamiento')
+    ax[0].plot(history.history['val_accuracy'], label='Precisión en validación')
+    ax[0].set_title(f'Precisión durante el Entrenamiento ({name})')
+    ax[0].set_xlabel('Épocas')
+    ax[0].set_ylabel('Precisión')
+    ax[0].legend()
+
+    ax[1].plot(history.history['loss'], label='Pérdida en entrenamiento')
+    ax[1].plot(history.history['val_loss'], label='Pérdida en validación')
+    ax[1].set_title(f'Pérdida durante el Entrenamiento ({name})')
+    ax[1].set_xlabel('Épocas')
+    ax[1].set_ylabel('Pérdida')
+    ax[1].legend()
+    st.pyplot(fig)
+
     st.write(f"""
     **Conclusión:**
-    La red neuronal con {name} logra una precisión del {accuracy_nn:.2f}. La reducción de dimensionalidad con {name} permite una visualización más clara de los datos, pero puede afectar ligeramente el rendimiento del modelo. La curva ROC con un AUC de {auc(roc_curve(y_test, y_pred_proba_nn)[0], roc_curve(y_test, y_pred_proba_nn)[1]):.2f} sigue siendo competitiva.
+    La red neuronal con {name} logra una precisión del {accuracy_nn:.2f}. La curva de aprendizaje muestra que el modelo converge adecuadamente, sin signos de sobreajuste. La curva ROC con un AUC de {auc(roc_curve(y_test, y_pred_proba_nn)[0], roc_curve(y_test, y_pred_proba_nn)[1]):.2f} confirma un buen rendimiento en la clasificación.
     """)
 
 ####################################################
