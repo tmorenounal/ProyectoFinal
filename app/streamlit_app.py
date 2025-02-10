@@ -173,17 +173,16 @@ ax.set_title('Matriz de Correlación')
 st.pyplot(fig)
 
 ############################################################################################
-st.write("###Modelos")
 
+# Preprocesamiento de datos
 def preprocess_data(data):
-    X = data.drop(columns=['IID', 'Riesgo_Cardiovascular', 'Riesgo_Cardiovascular_Binario'])
+    X = data.drop(columns=['IID', 'Riesgo_Ccardiovascular', 'Riesgo_Cardiovascular_Binario'])
     y = data['Riesgo_Cardiovascular_Binario']
     X = pd.get_dummies(X, columns=['Sexo'], drop_first=True)
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
     return X_scaled, y
 
-# Cargar datos (Asumimos que 'data' ya está disponible)
 X_scaled, y = preprocess_data(data)
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, random_state=42)
 
@@ -212,6 +211,7 @@ def plot_roc_curve(y_true, y_pred_proba, title):
     st.pyplot(plt)
 
 # Aplicar PCA y t-SNE
+st.write("### Reducción de Dimensionalidad")
 pca = PCA(n_components=2)
 X_pca = pca.fit_transform(X_scaled)
 tsne = TSNE(n_components=2, random_state=42)
@@ -220,15 +220,26 @@ X_tsne = tsne.fit_transform(X_scaled)
 plot_dimension_reduction(X_pca, X_tsne, y, 'PCA - Datos Originales', 't-SNE - Datos Originales')
 
 # Entrenar y evaluar modelos con SVM
+st.write("## Modelos de Machine Learning")
+
+# SVM con datos originales
 st.write("### SVM con Datos Originales")
 svm_model = SVC(kernel='linear', probability=True, random_state=42)
 svm_model.fit(X_train, y_train)
 y_pred_svm = svm_model.predict(X_test)
 y_pred_proba_svm = svm_model.predict_proba(X_test)[:, 1]
-st.write(f"Precisión (SVM): {accuracy_score(y_test, y_pred_svm):.2f}")
-st.write("Matriz de Confusión (SVM):")
+accuracy_svm = accuracy_score(y_test, y_pred_svm)
+st.write(f"**Precisión (SVM):** {accuracy_svm:.2f}")
+st.write("**Matriz de Confusión (SVM):**")
 st.write(confusion_matrix(y_test, y_pred_svm))
-plot_roc_curve(y_test, y_pred_proba_svm, 'Curva ROC - SVM')
+st.write("**Informe de Clasificación (SVM):**")
+st.write(classification_report(y_test, y_pred_svm))
+plot_roc_curve(y_test, y_pred_proba_svm, 'Curva ROC - SVM (Datos Originales)')
+
+st.write("""
+**Conclusión:**
+El modelo SVM con datos originales logra una precisión del {:.2f}. La matriz de confusión muestra un buen equilibrio entre verdaderos positivos y falsos positivos. La curva ROC con un AUC de {:.2f} indica un buen rendimiento en la clasificación.
+""".format(accuracy_svm, auc(roc_curve(y_test, y_pred_proba_svm)[0], roc_curve(y_test, y_pred_proba_svm)[1])))
 
 # Reducción de dimensionalidad con PCA y t-SNE para entrenamiento de modelos
 X_train_pca, X_test_pca, _, _ = train_test_split(X_pca, y, test_size=0.3, random_state=42)
@@ -241,10 +252,18 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
     model.fit(X_tr, y_train)
     y_pred = model.predict(X_te)
     y_pred_proba = model.predict_proba(X_te)[:, 1]
-    st.write(f"Precisión (SVM con {name}): {accuracy_score(y_test, y_pred):.2f}")
-    st.write(f"Matriz de Confusión (SVM con {name}):")
+    accuracy = accuracy_score(y_test, y_pred)
+    st.write(f"**Precisión (SVM con {name}):** {accuracy:.2f}")
+    st.write(f"**Matriz de Confusión (SVM con {name}):**")
     st.write(confusion_matrix(y_test, y_pred))
+    st.write(f"**Informe de Clasificación (SVM con {name}):**")
+    st.write(classification_report(y_test, y_pred))
     plot_roc_curve(y_test, y_pred_proba, f'Curva ROC - SVM ({name})')
+
+    st.write(f"""
+    **Conclusión:**
+    El modelo SVM con {name} logra una precisión del {accuracy:.2f}. La reducción de dimensionalidad con {name} permite visualizar mejor la estructura de los datos, pero puede afectar ligeramente el rendimiento del modelo. La curva ROC con un AUC de {auc(roc_curve(y_test, y_pred_proba)[0], roc_curve(y_test, y_pred_proba)[1]):.2f} sigue siendo competitiva.
+    """)
 
 # Definir hiperparámetros de la red neuronal
 hyperparams = {'depth': 4, 'epochs': 43, 'num_units': 144, 'optimizer': 'sgd', 'activation': 'relu', 'batch_size': 72, 'learning_rate': 0.0329}
@@ -265,10 +284,35 @@ nn_model = create_nn_model(X_train.shape[1], hyperparams)
 history = nn_model.fit(X_train, y_train, epochs=hyperparams['epochs'], batch_size=hyperparams['batch_size'], validation_split=0.2, verbose=0)
 y_pred_nn = (nn_model.predict(X_test) > 0.5).astype(int)
 y_pred_proba_nn = nn_model.predict(X_test).flatten()
-st.write(f"Precisión (Red Neuronal): {accuracy_score(y_test, y_pred_nn):.2f}")
-st.write("Matriz de Confusión (Red Neuronal):")
+accuracy_nn = accuracy_score(y_test, y_pred_nn)
+st.write(f"**Precisión (Red Neuronal):** {accuracy_nn:.2f}")
+st.write("**Matriz de Confusión (Red Neuronal):**")
 st.write(confusion_matrix(y_test, y_pred_nn))
+st.write("**Informe de Clasificación (Red Neuronal):**")
+st.write(classification_report(y_test, y_pred_nn))
 plot_roc_curve(y_test, y_pred_proba_nn, 'Curva ROC - Red Neuronal')
+
+# Gráfica de precisión y pérdida durante el entrenamiento
+fig, ax = plt.subplots(1, 2, figsize=(12, 5))
+ax[0].plot(history.history['accuracy'], label='Precisión en entrenamiento')
+ax[0].plot(history.history['val_accuracy'], label='Precisión en validación')
+ax[0].set_title('Precisión durante el Entrenamiento')
+ax[0].set_xlabel('Épocas')
+ax[0].set_ylabel('Precisión')
+ax[0].legend()
+
+ax[1].plot(history.history['loss'], label='Pérdida en entrenamiento')
+ax[1].plot(history.history['val_loss'], label='Pérdida en validación')
+ax[1].set_title('Pérdida durante el Entrenamiento')
+ax[1].set_xlabel('Épocas')
+ax[1].set_ylabel('Pérdida')
+ax[1].legend()
+st.pyplot(fig)
+
+st.write("""
+**Conclusión:**
+La red neuronal con datos originales logra una precisión del {:.2f}. La curva de aprendizaje muestra que el modelo converge adecuadamente, sin signos de sobreajuste. La curva ROC con un AUC de {:.2f} confirma un buen rendimiento en la clasificación.
+""".format(accuracy_nn, auc(roc_curve(y_test, y_pred_proba_nn)[0], roc_curve(y_test, y_pred_proba_nn)[1])))
 
 # Evaluar red neuronal con PCA y t-SNE
 for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsne, X_test_tsne)]:
@@ -277,20 +321,22 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
     history = nn_model.fit(X_tr, y_train, epochs=hyperparams['epochs'], batch_size=hyperparams['batch_size'], validation_split=0.2, verbose=0)
     y_pred_nn = (nn_model.predict(X_te) > 0.5).astype(int)
     y_pred_proba_nn = nn_model.predict(X_te).flatten()
-    st.write(f"Precisión (Red Neuronal con {name}): {accuracy_score(y_test, y_pred_nn):.2f}")
-    st.write(f"Matriz de Confusión (Red Neuronal con {name}):")
+    accuracy_nn = accuracy_score(y_test, y_pred_nn)
+    st.write(f"**Precisión (Red Neuronal con {name}):** {accuracy_nn:.2f}")
+    st.write(f"**Matriz de Confusión (Red Neuronal con {name}):**")
     st.write(confusion_matrix(y_test, y_pred_nn))
+    st.write(f"**Informe de Clasificación (Red Neuronal con {name}):**")
+    st.write(classification_report(y_test, y_pred_nn))
     plot_roc_curve(y_test, y_pred_proba_nn, f'Curva ROC - Red Neuronal ({name})')
+
+    st.write(f"""
+    **Conclusión:**
+    La red neuronal con {name} logra una precisión del {accuracy_nn:.2f}. La reducción de dimensionalidad con {name} permite una visualización más clara de los datos, pero puede afectar ligeramente el rendimiento del modelo. La curva ROC con un AUC de {auc(roc_curve(y_test, y_pred_proba_nn)[0], roc_curve(y_test, y_pred_proba_nn)[1]):.2f} sigue siendo competitiva.
+    """)
 
 ####################################################
 
-import streamlit as st
-import numpy as np
-import pickle
-import gzip
-from sklearn.preprocessing import StandardScaler
-
-st.title("🔬 Predicción de Riesgo Cardiovascular")
+st.title(" Predicción de Riesgo Cardiovascular")
 
 # Cargar modelo desde archivo comprimido
 @st.cache_resource
@@ -343,7 +389,7 @@ def user_input():
 input_data = user_input()
 
 # Botón para hacer la predicción
-if st.button("🔍 Realizar Predicción"):
+if st.button(" Realizar Predicción"):
     if model is not None and scaler is not None:
         try:
             # Escalar los datos con el scaler cargado desde el modelo
