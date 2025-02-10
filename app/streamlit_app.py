@@ -326,7 +326,7 @@ def user_input():
     return data
 
 st.title("Predicción de Riesgo Cardiovascular")
-model, scaler = load_model_and_scaler()
+model, scaler = load_scaler()
 input_data = user_input()
 
 scaled_data = scaler.transform(input_data)
