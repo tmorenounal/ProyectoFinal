@@ -166,56 +166,73 @@ sns.heatmap(data.corr(), annot=True, cmap='coolwarm', ax=ax)
 ax.set_title('Matriz de Correlación')
 st.pyplot(fig)
 
-# Preprocesamiento de datos
-def preprocess_data(data):
-    X = data.drop(columns=['Riesgo_Cardiovascular', 'Riesgo_Cardiovascular_Binario'])
-    y = data['Riesgo_Cardiovascular_Binario']
-    X = pd.get_dummies(X, drop_first=True)
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
-    return X_scaled, y
+################################
 
-X_scaled, y = preprocess_data(data)
+# Evaluación del Modelo SVM
+st.write("### Evaluación del Modelo SVM")
 
-# Reducción de dimensionalidad
-st.write("### Reducción de Dimensionalidad")
-option = st.selectbox('Técnica', ['Datos Originales', 'PCA', 't-SNE'])
+# Matriz de confusión para SVM
+cm_svm = confusion_matrix(y_test, y_pred_svm)
+fig, ax = plt.subplots()
+sns.heatmap(cm_svm, annot=True, fmt='d', cmap='Blues', xticklabels=["Bajo Riesgo", "Alto Riesgo"], yticklabels=["Bajo Riesgo", "Alto Riesgo"])
+ax.set_title("Matriz de Confusión - SVM")
+ax.set_xlabel("Predicho")
+ax.set_ylabel("Real")
+st.pyplot(fig)
 
-if option == 'PCA':
-    pca = PCA(n_components=2)
-    X_reduced = pca.fit_transform(X_scaled)
-elif option == 't-SNE':
-    if X_scaled.shape[1] > 50:
-        st.warning("t-SNE puede ser lento con muchas dimensiones, considere PCA primero.")
-    tsne = TSNE(n_components=2, random_state=42)
-    X_reduced = tsne.fit_transform(X_scaled)
-else:
-    X_reduced = X_scaled
+# Reporte de clasificación para SVM
+st.text("**Reporte de Clasificación - SVM**")
+st.text(classification_report(y_test, y_pred_svm))
 
-# Dividir datos
-X_train, X_test, y_train, y_test = train_test_split(X_reduced, y, test_size=0.3, random_state=42)
+# Explicación de Evaluación de SVM
+st.write("""
+**Interpretación de la Evaluación del SVM:**
+- La **matriz de confusión** muestra cuántas predicciones fueron correctas o incorrectas.
+- El **reporte de clasificación** indica métricas como precisión, recall y F1-score.
+- Un **F1-score alto** indica un buen balance entre precisión y recall.
+""")
 
-# Entrenar modelo SVM
-svm_model = SVC(kernel='linear', random_state=42)
-svm_model.fit(X_train, y_train)
-y_pred_svm = svm_model.predict(X_test)
-accuracy_svm = accuracy_score(y_test, y_pred_svm)
+# Evaluación del Modelo de Red Neuronal
+st.write("### Evaluación del Modelo de Red Neuronal")
 
-def create_nn_model(input_dim):
-    model = Sequential([
-        Dense(64, input_dim=input_dim, activation='relu'),
-        Dense(32, activation='relu'),
-        Dense(1, activation='sigmoid')
-    ])
-    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-    return model
+# Matriz de confusión para la red neuronal
+cm_nn = confusion_matrix(y_test, y_pred_nn)
+fig, ax = plt.subplots()
+sns.heatmap(cm_nn, annot=True, fmt='d', cmap='Greens', xticklabels=["Bajo Riesgo", "Alto Riesgo"], yticklabels=["Bajo Riesgo", "Alto Riesgo"])
+ax.set_title("Matriz de Confusión - Red Neuronal")
+ax.set_xlabel("Predicho")
+ax.set_ylabel("Real")
+st.pyplot(fig)
 
-# Entrenar modelo de red neuronal
-nn_model = create_nn_model(X_train.shape[1])
-nn_model.fit(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2, verbose=0)
-y_pred_nn = (nn_model.predict(X_test) > 0.5).astype(int)
-accuracy_nn = accuracy_score(y_test, y_pred_nn)
+# Reporte de clasificación para la red neuronal
+st.text("**Reporte de Clasificación - Red Neuronal**")
+st.text(classification_report(y_test, y_pred_nn))
 
-# Mostrar resultados
-st.write(f"#### Precisión del Modelo SVM: {accuracy_svm:.2f}")
-st.write(f"#### Precisión del Modelo de Red Neuronal: {accuracy_nn:.2f}")
+# Explicación de Evaluación de la Red Neuronal
+st.write("""
+**Interpretación de la Evaluación de la Red Neuronal:**
+- La **matriz de confusión** muestra la cantidad de aciertos y errores del modelo.
+- El **reporte de clasificación** detalla la precisión de las predicciones.
+- Un **F1-score alto** sugiere que el modelo clasifica correctamente la mayoría de los casos.
+""")
+
+# Gráfica de la evolución del entrenamiento de la red neuronal
+st.write("### Evolución del Entrenamiento de la Red Neuronal")
+history = nn_model.fit(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2, verbose=0)
+
+fig, ax = plt.subplots()
+ax.plot(history.history['accuracy'], label="Precisión en Entrenamiento")
+ax.plot(history.history['val_accuracy'], label="Precisión en Validación", linestyle="dashed")
+ax.set_title("Evolución de la Precisión")
+ax.set_xlabel("Épocas")
+ax.set_ylabel("Precisión")
+ax.legend()
+st.pyplot(fig)
+
+st.write("""
+**Interpretación de la Evolución del Entrenamiento:**
+- La línea **sólida** representa la precisión en los datos de entrenamiento.
+- La línea **discontinua** representa la precisión en datos de validación.
+- Si ambas líneas aumentan y se estabilizan, el modelo generaliza bien los datos.
+- Si la validación cae mientras el entrenamiento mejora, podría haber **sobreajuste**.
+""")
