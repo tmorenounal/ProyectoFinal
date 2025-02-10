@@ -283,21 +283,27 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
     plot_roc_curve(y_test, y_pred_proba_nn, f'Curva ROC - Red Neuronal ({name})')
 
 ####################################################
+import streamlit as st
+import numpy as np
+import pickle
+import gzip
+
 st.title("Predicción de Riesgo Cardiovascular")
 
-# Cargar solo el modelo
+# Cargar modelo desde archivo comprimido
+@st.cache_resource
 def load_model():
-    """Carga el modelo desde un archivo comprimido y verifica su integridad."""
+    """Carga el modelo y el scaler desde un archivo comprimido."""
     try:
-        with gzip.open('best_model.pkl.gz', 'rb') as f:
-            model = pickle.load(f)
-        return model
+        with gzip.open("best_model.pkl.gz", "rb") as f:
+            model, scaler = pickle.load(f)  # Se asume que se guardó junto con el scaler
+        return model, scaler
     except Exception as e:
         st.error(f"Error al cargar el modelo: {e}")
-        return None
+        return None, None
 
-# Cargar el modelo
-model = load_model()
+# Cargar el modelo y el scaler
+model, scaler = load_model()
 
 # Función para ingresar datos del usuario
 def user_input():
@@ -326,27 +332,30 @@ def user_input():
 # Obtener datos del usuario
 input_data = user_input()
 
-# Verificar si el modelo se cargó correctamente
-if model is not None:
-    try:
-        # Ajustar la forma de entrada si es necesario
-        expected_shape = model.input_shape  # Obtener la forma de entrada esperada
+# Botón para hacer la predicción
+if st.button("Realizar Predicción"):
+    if model is not None and scaler is not None:
+        try:
+            # Escalar los datos antes de la predicción
+            input_data_scaled = scaler.transform(input_data)
 
-        if len(expected_shape) == 2 and expected_shape[1] == 14:
-            # Modelo espera una entrada de (None, 14), correcto
-            prediction = model.predict(input_data)
-        elif len(expected_shape) == 3 and expected_shape[1:] == (14, 1):
-            # Modelo espera (None, 14, 1), entonces se debe reformatear
-            input_data = input_data.reshape(1, 14, 1)
-            prediction = model.predict(input_data)
-        else:
-            st.error(f"Error: la forma del modelo no coincide con los datos. Esperado: {expected_shape}, pero se obtuvo: {input_data.shape}")
-            prediction = None
+            # Verificar la forma esperada del modelo
+            expected_shape = model.input_shape  
+            if len(expected_shape) == 2 and expected_shape[1] == 14:
+                prediction = model.predict(input_data_scaled)
+            elif len(expected_shape) == 3 and expected_shape[1:] == (14, 1):
+                input_data_scaled = input_data_scaled.reshape(1, 14, 1)
+                prediction = model.predict(input_data_scaled)
+            else:
+                st.error(f"Error: la forma del modelo no coincide con los datos. Esperado: {expected_shape}, pero se obtuvo: {input_data_scaled.shape}")
+                prediction = None
 
-        if prediction is not None:
-            prediction_label = "Alto Riesgo" if prediction[0] >= 0.5 else "Bajo Riesgo"
-            st.write(f"### Resultado de la Predicción: {prediction_label}")
-    except Exception as e:
-        st.error(f"Error en la predicción: {e}")
-else:
-    st.error("No se pudo cargar el modelo.")
+            if prediction is not None:
+                prediction_label = "🔴 Alto Riesgo" if prediction[0] >= 0.5 else "🟢 Bajo Riesgo"
+                st.subheader("Resultado de la Predicción:")
+                st.markdown(f"## {prediction_label}")
+
+        except Exception as e:
+            st.error(f"Error en la predicción: {e}")
+    else:
+        st.error("No se pudo cargar el modelo.")
