@@ -169,58 +169,66 @@ st.pyplot(fig)
 
 ############################################################################################
 
-# Preparar los datos para los modelos
-features = list(pesos.keys())
-X = data[features]
+X = data[list(pesos.keys())]
 y = data['Riesgo_Cardiovascular_Binario']
-X_scaled = StandardScaler().fit_transform(X)
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
 
-# Modelo SVM
-svm_model = SVC(kernel='linear')
-svm_model.fit(X_train, y_train)
-y_pred_svm = svm_model.predict(X_test)
+# Modelo SVM con datos originales
+svm_model = SVC(probability=True)
+svm_model.fit(X_train_scaled, y_train)
+y_pred_svm = svm_model.predict(X_test_scaled)
+y_pred_svm_prob = svm_model.predict_proba(X_test_scaled)[:, 1]
+st.write("### Evaluación SVM con Datos Originales")
+st.text(classification_report(y_test, y_pred_svm))
 
-# Modelo de Red Neuronal
-nn_model = Sequential([
-    Dense(16, activation='relu', input_shape=(X_train.shape[1],)),
-    Dense(8, activation='relu'),
+# Reducción de Dimensionalidad con PCA
+pca = PCA(n_components=2)
+X_train_pca = pca.fit_transform(X_train_scaled)
+X_test_pca = pca.transform(X_test_scaled)
+svm_pca = SVC(probability=True)
+svm_pca.fit(X_train_pca, y_train)
+y_pred_pca = svm_pca.predict(X_test_pca)
+st.write("### Evaluación SVM con PCA")
+st.text(classification_report(y_test, y_pred_pca))
+
+# Reducción de Dimensionalidad con t-SNE
+tsne = TSNE(n_components=2, random_state=42)
+X_train_tsne = tsne.fit_transform(X_train_scaled)
+X_test_tsne = tsne.fit_transform(X_test_scaled)
+svm_tsne = SVC(probability=True)
+svm_tsne.fit(X_train_tsne, y_train)
+y_pred_tsne = svm_tsne.predict(X_test_tsne)
+st.write("### Evaluación SVM con t-SNE")
+st.text(classification_report(y_test, y_pred_tsne))
+
+# Red Neuronal con PCA
+model_pca = Sequential([
+    Dense(144, activation='relu', input_shape=(2,)),
+    Dense(144, activation='relu'),
+    Dense(144, activation='relu'),
+    Dense(144, activation='relu'),
     Dense(1, activation='sigmoid')
 ])
-nn_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-nn_model.fit(X_train, y_train, epochs=50, batch_size=10, verbose=0)
-y_pred_nn = (nn_model.predict(X_test) > 0.5).astype(int).flatten()
+optimizer = SGD(learning_rate=0.0329)
+model_pca.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
+model_pca.fit(X_train_pca, y_train, epochs=43, batch_size=72, verbose=1)
+st.write("### Evaluación Red Neuronal con PCA")
+loss_pca, acc_pca = model_pca.evaluate(X_test_pca, y_test)
+st.write(f"Loss: {loss_pca}, Accuracy: {acc_pca}")
 
-# Reducción de dimensionalidad con PCA
-pca = PCA(n_components=2)
-X_pca = pca.fit_transform(X_scaled)
-
-# Reducción de dimensionalidad con t-SNE
-tsne = TSNE(n_components=2, random_state=42)
-X_tsne = tsne.fit_transform(X_scaled)
-
-# Evaluación de modelos
-def evaluate_model(y_true, y_pred, model_name):
-    st.write(f"### Evaluación del modelo: {model_name}")
-    st.write(f"Accuracy: {accuracy_score(y_true, y_pred):.4f}")
-    st.write("Matriz de Confusión:")
-    st.text(confusion_matrix(y_true, y_pred))
-    st.write("Reporte de Clasificación:")
-    st.text(classification_report(y_true, y_pred))
-
-evaluate_model(y_test, y_pred_svm, "SVM")
-evaluate_model(y_test, y_pred_nn, "Red Neuronal")
-
-# Visualización de PCA y t-SNE
-def plot_dim_reduction(X_transformed, y, title):
-    df_vis = pd.DataFrame(X_transformed, columns=['Componente 1', 'Componente 2'])
-    df_vis['Clase'] = y.values
-    
-    plt.figure(figsize=(8, 6))
-    sns.scatterplot(x='Componente 1', y='Componente 2', hue='Clase', data=df_vis, palette='coolwarm', alpha=0.7)
-    plt.title(title)
-    st.pyplot(plt)
-
-st.write("### Visualización de Reducción de Dimensionalidad")
-plot_dim_reduction(X_pca, y, "PCA")
-plot_dim_reduction(X_tsne, y, "t-SNE")
+# Red Neuronal con t-SNE
+model_tsne = Sequential([
+    Dense(144, activation='relu', input_shape=(2,)),
+    Dense(144, activation='relu'),
+    Dense(144, activation='relu'),
+    Dense(144, activation='relu'),
+    Dense(1, activation='sigmoid')
+])
+model_tsne.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
+model_tsne.fit(X_train_tsne, y_train, epochs=43, batch_size=72, verbose=1)
+st.write("### Evaluación Red Neuronal con t-SNE")
+loss_tsne, acc_tsne = model_tsne.evaluate(X_test_tsne, y_test)
+st.write(f"Loss: {loss_tsne}, Accuracy: {acc_tsne}")
