@@ -212,7 +212,7 @@ model_pca = Sequential([
     Dense(144, activation='relu'),
     Dense(1, activation='sigmoid')
 ])
-optimizer = SGD(learning_rate=0.0329)
+optimizer = SGD(learning_rate=0.03290099263663578)
 model_pca.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
 model_pca.fit(X_train_pca, y_train, epochs=43, batch_size=72, verbose=1)
 st.write("### Evaluación Red Neuronal con PCA")
@@ -232,4 +232,3 @@ model_tsne.fit(X_train_tsne, y_train, epochs=43, batch_size=72, verbose=1)
 st.write("### Evaluación Red Neuronal con t-SNE")
 loss_tsne, acc_tsne = model_tsne.evaluate(X_test_tsne, y_test)
 st.write(f"Loss: {loss_tsne}, Accuracy: {acc_tsne}")
-
