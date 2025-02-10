@@ -144,13 +144,6 @@ st.dataframe(data.head(5))
 st.write("### Información de los datos")
 st.write(data.describe())
 
-# Capturar la información del DataFrame normalizado
-buffer = io.StringIO()
-data_normalized.info(buf=buffer)  # Captura la salida de data.info()
-info_str = buffer.getvalue()  # Convierte el buffer en string
-
-st.write("### Información del DataFrame normalizado")
-st.text(info_str)  # Muestra el contenido de info() en formato de texto
 
 st.write("""
 ### Variable Objetivo: Riesgo Cardiovascular
