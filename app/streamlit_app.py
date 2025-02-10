@@ -285,4 +285,44 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 
 st.write("### Predicción")
 
+def load_model_and_scaler():
+    with open('best_model.pkl', 'rb') as model_file:
+        model = pickle.load(model_file)
+    with open('scaler.pkl', 'rb') as scaler_file:
+        scaler = pickle.load(scaler_file)
+    return model, scaler
+
+def user_input():
+    sexo = st.selectbox("Sexo", ["Femenino", "Masculino"])
+    edad = st.number_input("Edad", min_value=18, max_value=100, step=1)
+    leptina = st.number_input("Leptina", min_value=0.0, step=0.1)
+    grasa = st.number_input("Grasa", min_value=0.0, step=0.1)
+    imc = st.number_input("IMC", min_value=10.0, step=0.1)
+    bai = st.number_input("BAI", min_value=0.0, step=0.1)
+    cintura = st.number_input("Cintura", min_value=30.0, step=0.1)
+    cadera = st.number_input("Cadera", min_value=30.0, step=0.1)
+    cvldl = st.number_input("CVLDL", min_value=0.0, step=0.1)
+    triglic = st.number_input("Triglicéridos", min_value=0.0, step=0.1)
+    ctotal = st.number_input("Colesterol Total", min_value=0.0, step=0.1)
+    cldl = st.number_input("CLDL", min_value=0.0, step=0.1)
+    chdl = st.number_input("CHDL", min_value=0.0, step=0.1)
+    fto_aditivo = st.number_input("FTO Aditivo", min_value=0.0, step=0.1)
+    
+    sexo_binario = 1 if sexo == "Masculino" else 0  # Codificar Sexo
+    
+    data = np.array([[sexo_binario, edad, leptina, grasa, imc, bai, cintura, cadera, 
+                      cvldl, triglic, ctotal, cldl, chdl, fto_aditivo]])
+    return data
+
+st.title("Predicción de Riesgo Cardiovascular")
+model, scaler = load_model_and_scaler()
+input_data = user_input()
+
+scaled_data = scaler.transform(input_data)
+prediction = model.predict(scaled_data)
+prediction_label = "Alto Riesgo" if prediction[0] == 1 else "Bajo Riesgo"
+
+st.write(f"### Resultado de la Predicción: {prediction_label}")
+
+
 
