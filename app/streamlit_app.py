@@ -494,9 +494,6 @@ if st.button("Realizar Predicción"):
             st.subheader("Resultado de la Predicción:")
             st.markdown(f"## {prediction_label}")
 
-            # Mostrar los datos escalados (para depuración)
-            st.write("Datos escalados para la predicción:")
-            st.write(input_data_scaled)
 
         except Exception as e:
             st.error(f"Error en la predicción: {e}")
