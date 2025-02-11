@@ -499,10 +499,10 @@ if st.button(" Realizar Predicción"):
                 predicted_class = 1 if prediction_value >= 0.5 else 0
 
             # Determinar la clase
-            prediction_label = "🔴 Alto Riesgo" if predicted_class == 1 else "🟢 Bajo Riesgo"
+            prediction_label = "🟢 Bajo Riesgo" if predicted_class == 1 else "🔴 Alto Riesgo"
 
             # Mostrar resultados
-            st.subheader(" Resultado de la Predicción:")
+            st.write(prediction)
             st.write(f"📊 Clase predicha: {predicted_class}")
 
         except Exception as e:
