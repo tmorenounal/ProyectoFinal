@@ -106,12 +106,7 @@ umbral = data['Riesgo_Cardiovascular'].max() * 0.5  # Ajustar según necesidad
 # Crear variable binaria de riesgo cardiovascular
 data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > umbral).astype(int)
 
-# Normalización de variables con escalas muy grandes
-cols_to_scale = ["Leptina", "Triglic", "CTOTAL", "CLDL", "BAI"]
-scaler = StandardScaler()
 
-# Aplicar StandardScaler a las columnas seleccionadas
-data[cols_to_scale] = scaler.fit_transform(data[cols_to_scale])
 
 
 # Mostrar datos
