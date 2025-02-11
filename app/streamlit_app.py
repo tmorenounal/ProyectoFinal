@@ -420,39 +420,27 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 
 ####################################################
 
-import streamlit as st
-import numpy as np
-import pickle
-import gzip
-from sklearn.preprocessing import StandardScaler
-
-# Título de la aplicación
 st.title("Predicción de Riesgo Cardiovascular")
 
 # Cargar modelo desde archivo comprimido
 @st.cache_resource
 def load_model():
-    """Carga el modelo y el scaler desde un archivo comprimido."""
+    """Carga el modelo desde un archivo comprimido."""
     try:
         with gzip.open("best_model.pkl.gz", "rb") as f:
-            data = pickle.load(f)  # Carga el diccionario con el modelo y scaler
+            model = pickle.load(f)  # Carga el modelo
 
-        if isinstance(data, dict):
-            model = data.get("modelo", None)  # Extraer modelo
-            scaler = data.get("scaler", None)  # Extraer scaler
-            if model is None or scaler is None:
-                raise ValueError("El archivo no contiene el modelo o el scaler.")
-            return model, scaler
-        else:
-            raise ValueError("El archivo no tiene el formato esperado.")
+        if model is None:
+            raise ValueError("El archivo no contiene un modelo válido.")
+        return model
     except Exception as e:
         st.error(f"Error al cargar el modelo: {e}")
-        return None, None
+        return None
 
-# Cargar el modelo y el scaler
-model, scaler = load_model()
+# Cargar el modelo
+model = load_model()
 
-# Función para ingresar datos del usuario con valores predeterminados y escalas correctas
+# Función para ingresar datos del usuario con valores predeterminados
 def user_input():
     st.header("Ingresar Datos del Paciente")
 
@@ -488,17 +476,14 @@ input_data = user_input()
 
 # Botón para hacer la predicción
 if st.button("Realizar Predicción"):
-    if model is not None and scaler is not None:
+    if model is not None:
         try:
-            # Escalar los datos con el scaler cargado desde el modelo
-            input_data_scaled = scaler.transform(input_data)
-
-            # Mostrar los datos escalados (para depuración)
-            st.write("Datos escalados para la predicción:")
-            st.write(input_data_scaled)
+            # Mostrar los datos de entrada (para depuración)
+            st.write("Datos de entrada para la predicción:")
+            st.write(input_data)
 
             # Realizar la predicción
-            prediction = model.predict(input_data_scaled)
+            prediction = model.predict(input_data)
 
             # Mostrar el resultado de la predicción
             prediction_label = "🔴 Alto Riesgo" if prediction[0] >= 0.5 else "🟢 Bajo Riesgo"
@@ -508,4 +493,4 @@ if st.button("Realizar Predicción"):
         except Exception as e:
             st.error(f"Error en la predicción: {e}")
     else:
-        st.error("No se pudo cargar el modelo y/o el scaler.")
+        st.error("No se pudo cargar el modelo.")
