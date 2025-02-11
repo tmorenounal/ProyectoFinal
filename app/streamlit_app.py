@@ -471,7 +471,7 @@ def user_input():
 input_data = user_input()
 
 # Botón para hacer la predicción
-if st.button("🔮 Realizar Predicción"):
+if st.button(" Realizar Predicción"):
     if model is not None and scaler is not None:
         try:
             # Verificar dimensiones esperadas por el scaler
@@ -494,7 +494,7 @@ if st.button("🔮 Realizar Predicción"):
 
                 # Mostrar resultados
                 st.subheader("📌 Resultado de la Predicción:")
-                st.markdown(f"## {prediction_label}")
+                
                
 
         except Exception as e:
