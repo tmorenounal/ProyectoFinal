@@ -414,6 +414,9 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
     """)
 
 ####################################################
+
+
+
 import streamlit as st
 import numpy as np
 import pickle
@@ -445,7 +448,7 @@ def load_model():
 # Cargar el modelo y el scaler
 model, scaler = load_model()
 
-# Función para ingresar datos del usuario (Valores ajustados para Alto Riesgo)
+# Función para ingresar datos del usuario
 def user_input():
     st.header("📋 Ingresar Datos del Paciente")
 
@@ -497,10 +500,11 @@ if st.button("🚀 Realizar Predicción"):
             else:
                 st.markdown("## 🟢 **Bajo Riesgo**")
 
-            # Mostrar el valor de predicción
-            st.write(f"📊 **Valor de predicción:** {prediction[0]:.4f}")
+            # Mostrar el valor de predicción (CORREGIDO)
+            st.write(f"📊 **Valor de predicción:** {float(prediction[0]):.4f}")
 
         except Exception as e:
             st.error(f"⚠️ Error en la predicción: {e}")
     else:
         st.error("⚠️ No se pudo cargar el modelo y/o el scaler.")
+
