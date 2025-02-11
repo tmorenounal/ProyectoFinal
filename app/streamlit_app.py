@@ -416,12 +416,7 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 ####################################################
 
 
-import streamlit as st
-import numpy as np
-import pickle
-import gzip
 
-# Título de la aplicación
 st.title("Predicción de Riesgo Cardiovascular")
 
 # Cargar modelo desde archivo comprimido
@@ -492,18 +487,14 @@ if st.button("🔮 Realizar Predicción"):
 
             # Realizar la predicción
             prediction = model.predict(input_data_scaled)
+            prediction = np.array(prediction).flatten()  # Asegurar que sea un array plano
 
             # Mostrar la salida del modelo (para depuración)
             st.write("🧠 Salida del modelo (predicción):")
             st.write(prediction)
 
             # Interpretar la predicción
-            if isinstance(prediction, np.ndarray):
-                prediction_value = prediction[0][0] if prediction.shape[1] > 1 else prediction[0]
-            else:
-                prediction_value = prediction
-
-            # Clasificar el riesgo
+            prediction_value = prediction[0]  # Extraer el valor
             prediction_label = "🔴 Alto Riesgo" if prediction_value >= 0.5 else "🟢 Bajo Riesgo"
 
             # Mostrar resultados
@@ -515,3 +506,4 @@ if st.button("🔮 Realizar Predicción"):
             st.error(f"⚠️ Error en la predicción: {e}")
     else:
         st.error("⚠️ No se pudo cargar el modelo y/o el scaler.")
+
