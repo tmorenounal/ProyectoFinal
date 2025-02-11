@@ -415,7 +415,11 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 
 ####################################################
 
-
+import streamlit as st
+import numpy as np
+import pickle
+import gzip
+from sklearn.preprocessing import StandardScaler
 
 st.title("Predicción de Riesgo Cardiovascular")
 
@@ -490,20 +494,27 @@ if st.button("🔮 Realizar Predicción"):
             prediction = np.array(prediction).flatten()  # Asegurar que sea un array plano
 
             # Mostrar la salida del modelo (para depuración)
-            st.write("🧠 Salida del modelo (predicción):")
+            st.write("🧠 Salida del modelo (predicción, sin procesar):")
             st.write(prediction)
 
-            # Interpretar la predicción
-            prediction_value = prediction[0]  # Extraer el valor
-            prediction_label = "🔴 Alto Riesgo" if prediction_value >= 0.5 else "🟢 Bajo Riesgo"
+            # Manejar salida de softmax o sigmoid
+            if prediction.shape[0] > 1:  # Softmax (varias clases)
+                predicted_class = np.argmax(prediction)  # Clase con mayor probabilidad
+                prediction_value = prediction[predicted_class]
+            else:  # Sigmoid (1 neurona de salida)
+                prediction_value = prediction[0]
+                predicted_class = 1 if prediction_value >= 0.5 else 0
+
+            # Etiqueta de predicción
+            prediction_label = "🔴 Alto Riesgo" if predicted_class == 1 else "🟢 Bajo Riesgo"
 
             # Mostrar resultados
             st.subheader("📌 Resultado de la Predicción:")
             st.markdown(f"## {prediction_label}")
             st.write(f"📊 Valor de predicción: {prediction_value:.4f}")
+            st.write(f"📊 Clase predicha: {predicted_class}")
 
         except Exception as e:
             st.error(f"⚠️ Error en la predicción: {e}")
     else:
         st.error("⚠️ No se pudo cargar el modelo y/o el scaler.")
-
