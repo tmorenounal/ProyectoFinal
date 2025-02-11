@@ -416,6 +416,7 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 ####################################################
 
 
+
 st.title("Predicción de Riesgo Cardiovascular")
 
 # Cargar modelo desde archivo comprimido
@@ -477,8 +478,10 @@ input_data = user_input()
 if st.button("🔮 Realizar Predicción"):
     if model is not None and scaler is not None:
         try:
-            # Escalar los datos correctamente
-            input_data_scaled = scaler.transform(input_data)
+            # Escalar solo las columnas numéricas que requieren escalado
+            # Asume que el scaler fue entrenado con las columnas correctas
+            input_data_scaled = input_data.copy()
+            input_data_scaled[:, 1:] = scaler.transform(input_data[:, 1:])  # Escalar todas las columnas excepto la primera (sexo)
 
             # Mostrar los datos escalados (para depuración)
             st.write("📏 Datos escalados para la predicción:")
@@ -493,7 +496,7 @@ if st.button("🔮 Realizar Predicción"):
 
             # Interpretar la predicción
             if isinstance(prediction, np.ndarray):
-                prediction_value = prediction[0][0] if prediction.shape[1] > 1 else prediction[0]
+                prediction_value = prediction[0]  # Tomar el primer valor del array
             else:
                 prediction_value = prediction
 
@@ -503,7 +506,7 @@ if st.button("🔮 Realizar Predicción"):
             # Mostrar resultados
             st.subheader("📌 Resultado de la Predicción:")
             st.markdown(f"## {prediction_label}")
-            st.write(f"📊 Valor de predicción: {prediction_value:.4f}")
+            st.write(f"📊 Valor de predicción: {float(prediction_value):.4f}")  # Convertir a float antes de formatear
 
         except Exception as e:
             st.error(f"⚠️ Error en la predicción: {e}")
