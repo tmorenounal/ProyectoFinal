@@ -485,33 +485,33 @@ if st.button("🔮 Realizar Predicción"):
             # Escalar los datos correctamente
             input_data_scaled = scaler.transform(input_data)
 
-            # Mostrar los datos escalados (para depuración)
-            st.write("📏 Datos escalados para la predicción:")
-            st.write(input_data_scaled)
+            # Mostrar los datos sin escalar
+            st.write("📏 Datos sin escalar para la predicción:")
+            st.write(input_data)
 
             # Realizar la predicción
             prediction = model.predict(input_data_scaled)
-            prediction = np.array(prediction).flatten()  # Asegurar que sea un array plano
+            prediction = np.array(prediction).flatten()
 
-            # Mostrar la salida del modelo (para depuración)
-            st.write("🧠 Salida del modelo (predicción, sin procesar):")
+            # Mostrar la salida del modelo sin procesar
+            st.write("🧠 Salida del modelo (predicción sin procesar):")
             st.write(prediction)
 
-            # Forzar predicciones manuales con valores extremos
+            # Prueba con valores extremos
             extreme_input = np.array([[1, 100, 100, 100, 50, 50, 200, 200, 200, 500, 400, 300, 100, 1]], dtype=np.float32)
             extreme_input_scaled = scaler.transform(extreme_input)
             extreme_prediction = model.predict(extreme_input_scaled).flatten()
-            st.write("🚨 Predicción con valores extremos (depuración):", extreme_prediction)
+            st.write("🚨 Predicción con valores extremos:", extreme_prediction)
 
-            # Manejar salida de softmax o sigmoid
-            if prediction.shape[0] > 1:  # Softmax (varias clases)
-                predicted_class = np.argmax(prediction)  # Clase con mayor probabilidad
+            # Interpretar la predicción
+            if prediction.shape[0] > 1:  # Para modelos con softmax
+                predicted_class = np.argmax(prediction)
                 prediction_value = prediction[predicted_class]
-            else:  # Sigmoid (1 neurona de salida)
+            else:  # Para modelos con sigmoide
                 prediction_value = prediction[0]
                 predicted_class = 1 if prediction_value >= 0.5 else 0
 
-            # Etiqueta de predicción
+            # Determinar la clase
             prediction_label = "🔴 Alto Riesgo" if predicted_class == 1 else "🟢 Bajo Riesgo"
 
             # Mostrar resultados
@@ -524,4 +524,3 @@ if st.button("🔮 Realizar Predicción"):
             st.error(f"⚠️ Error en la predicción: {e}")
     else:
         st.error("⚠️ No se pudo cargar el modelo y/o el scaler.")
-
