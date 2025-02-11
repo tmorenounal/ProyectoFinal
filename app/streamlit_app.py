@@ -324,7 +324,7 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 
     st.write(f"""
     **Conclusión:**
-    El modelo SVM con {name} logra una precisión del {accuracy:.2f}. La reducción de dimensionalidad con {name} permite visualizar mejor la estructura de los datos, pero puede afectar ligeramente el rendimiento del modelo. La curva ROC con un AUC de {auc(roc_curve(y_test, y_pred_proba)[0], roc_curve(y_test, y_pred_proba)[1]):.2f} sigue siendo competitiva.
+    El modelo SVM con {name} logra una precisión del {accuracy:.2f}. La curva ROC con un AUC de {auc(roc_curve(y_test, y_pred_proba)[0], roc_curve(y_test, y_pred_proba)[1]):.2f}.
     """)
 
 # Definir hiperparámetros de la red neuronal
@@ -410,16 +410,11 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 
     st.write(f"""
     **Conclusión:**
-    La red neuronal con {name} logra una precisión del {accuracy_nn:.2f}. La curva de aprendizaje muestra que el modelo converge adecuadamente, sin signos de sobreajuste. La curva ROC con un AUC de {auc(roc_curve(y_test, y_pred_proba_nn)[0], roc_curve(y_test, y_pred_proba_nn)[1]):.2f} confirma un buen rendimiento en la clasificación.
+    La red neuronal con {name} logra una precisión del {accuracy_nn:.2f}. La curva ROC con un AUC de {auc(roc_curve(y_test, y_pred_proba_nn)[0], roc_curve(y_test, y_pred_proba_nn)[1]):.2f}.
     """)
 
 ####################################################
 
-import streamlit as st
-import numpy as np
-import pickle
-import gzip
-from sklearn.preprocessing import StandardScaler
 
 st.title("Predicción de Riesgo Cardiovascular")
 
@@ -446,25 +441,25 @@ model, scaler = load_model()
 
 # Función para ingresar datos del usuario
 def user_input():
-    st.header("📋 Ingresar Datos del Paciente")
+    st.header(" Ingresar Datos del Paciente")
 
     # Variables categóricas
     sexo = st.selectbox("Sexo", ["Femenino", "Masculino"], index=1)
     fto_aditivo = st.selectbox("FTO Aditivo", [0, 1], index=0)
 
     # Variables numéricas
-    edad = st.number_input("Edad", min_value=18, max_value=100, value=60)
-    leptina = st.number_input("Leptina (ng/mL)", min_value=0.0, max_value=100.0, value=30.0)
-    grasa = st.number_input("Grasa Corporal (%)", min_value=0.0, max_value=100.0, value=35.0)
-    imc = st.number_input("Índice de Masa Corporal (IMC)", min_value=10.0, max_value=50.0, value=32.0)
-    bai = st.number_input("Índice de Adiposidad Corporal (BAI)", min_value=0.0, max_value=50.0, value=30.0)
-    cintura = st.number_input("Circunferencia de Cintura (cm)", min_value=30.0, max_value=200.0, value=110.0)
-    cadera = st.number_input("Circunferencia de Cadera (cm)", min_value=30.0, max_value=200.0, value=120.0)
-    cvldl = st.number_input("Colesterol VLDL (mg/dL)", min_value=0.0, max_value=200.0, value=50.0)
-    triglic = st.number_input("Triglicéridos (mg/dL)", min_value=0.0, max_value=500.0, value=250.0)
-    ctotal = st.number_input("Colesterol Total (mg/dL)", min_value=0.0, max_value=400.0, value=280.0)
-    cldl = st.number_input("Colesterol LDL (mg/dL)", min_value=0.0, max_value=300.0, value=180.0)
-    chdl = st.number_input("Colesterol HDL (mg/dL)", min_value=0.0, max_value=100.0, value=35.0)
+    edad = st.number_input("Edad", min_value=18, max_value=100, value=25)
+    leptina = st.number_input("Leptina (ng/mL)", min_value=0.0, max_value=100.0, value=5.0)
+    grasa = st.number_input("Grasa Corporal (%)", min_value=0.0, max_value=100.0, value=15.0)
+    imc = st.number_input("Índice de Masa Corporal (IMC)", min_value=10.0, max_value=50.0, value=22.0)
+    bai = st.number_input("Índice de Adiposidad Corporal (BAI)", min_value=0.0, max_value=50.0, value=18.0)
+    cintura = st.number_input("Circunferencia de Cintura (cm)", min_value=30.0, max_value=200.0, value=80.0)
+    cadera = st.number_input("Circunferencia de Cadera (cm)", min_value=30.0, max_value=200.0, value=90.0)
+    cvldl = st.number_input("Colesterol VLDL (mg/dL)", min_value=0.0, max_value=200.0, value=10.0)
+    triglic = st.number_input("Triglicéridos (mg/dL)", min_value=0.0, max_value=500.0, value=50.0)
+    ctotal = st.number_input("Colesterol Total (mg/dL)", min_value=0.0, max_value=400.0, value=180.0)
+    cldl = st.number_input("Colesterol LDL (mg/dL)", min_value=0.0, max_value=300.0, value=100.0)
+    chdl = st.number_input("Colesterol HDL (mg/dL)", min_value=0.0, max_value=100.0, value=60.0)
 
     # Convertir sexo a variable binaria (0 = Femenino, 1 = Masculino)
     sexo_binario = 1 if sexo == "Masculino" else 0
@@ -479,29 +474,21 @@ def user_input():
 input_data = user_input()
 
 # Botón para hacer la predicción
-if st.button("🔮 Realizar Predicción"):
+if st.button(" Realizar Predicción"):
     if model is not None and scaler is not None:
         try:
             # Escalar los datos correctamente
             input_data_scaled = scaler.transform(input_data)
 
-            # Mostrar los datos sin escalar
-            st.write("📏 Datos sin escalar para la predicción:")
-            st.write(input_data)
-
             # Realizar la predicción
             prediction = model.predict(input_data_scaled)
             prediction = np.array(prediction).flatten()
-
-            # Mostrar la salida del modelo sin procesar
-            st.write("🧠 Salida del modelo (predicción sin procesar):")
-            st.write(prediction)
 
             # Prueba con valores extremos
             extreme_input = np.array([[1, 100, 100, 100, 50, 50, 200, 200, 200, 500, 400, 300, 100, 1]], dtype=np.float32)
             extreme_input_scaled = scaler.transform(extreme_input)
             extreme_prediction = model.predict(extreme_input_scaled).flatten()
-            st.write("🚨 Predicción con valores extremos:", extreme_prediction)
+            st.write(" Predicción con valores extremos:", extreme_prediction)
 
             # Interpretar la predicción
             if prediction.shape[0] > 1:  # Para modelos con softmax
@@ -515,9 +502,7 @@ if st.button("🔮 Realizar Predicción"):
             prediction_label = "🔴 Alto Riesgo" if predicted_class == 1 else "🟢 Bajo Riesgo"
 
             # Mostrar resultados
-            st.subheader("📌 Resultado de la Predicción:")
-            st.markdown(f"## {prediction_label}")
-            st.write(f"📊 Valor de predicción: {prediction_value:.4f}")
+            st.subheader(" Resultado de la Predicción:")
             st.write(f"📊 Clase predicha: {predicted_class}")
 
         except Exception as e:
