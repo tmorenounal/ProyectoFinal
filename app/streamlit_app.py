@@ -421,7 +421,10 @@ import numpy as np
 import pickle
 import gzip
 
-# 📌 Cargar modelo desde archivo comprimido
+# Título de la aplicación
+st.title("Predicción de Riesgo Cardiovascular")
+
+# Cargar modelo desde archivo comprimido
 @st.cache_resource
 def load_model():
     """Carga el modelo y el scaler desde un archivo comprimido."""
@@ -439,10 +442,10 @@ def load_model():
         st.error(f"Error al cargar el modelo: {e}")
         return None, None
 
-# 📥 Cargar modelo y scaler
+# Cargar modelo y scaler
 model, scaler = load_model()
 
-# 📊 Función para ingresar datos del usuario
+# Función para ingresar datos del usuario
 def user_input():
     st.header("📋 Ingresar Datos del Paciente")
 
@@ -464,38 +467,51 @@ def user_input():
     cldl = st.number_input("Colesterol LDL (mg/dL)", min_value=0.0, max_value=300.0, value=180.0)
     chdl = st.number_input("Colesterol HDL (mg/dL)", min_value=0.0, max_value=100.0, value=35.0)
 
-    # ✅ Convertir sexo a variable binaria (0 = Femenino, 1 = Masculino)
+    # Convertir sexo a variable binaria (0 = Femenino, 1 = Masculino)
     sexo_binario = 1 if sexo == "Masculino" else 0
 
-    # 📊 Crear un array con los datos ingresados
+    # Crear un array con los datos ingresados
     data = np.array([[sexo_binario, edad, leptina, grasa, imc, bai, cintura, cadera, 
                       cvldl, triglic, ctotal, cldl, chdl, fto_aditivo]], dtype=np.float32)
 
     return data
 
-# 📌 Obtener datos del usuario
+# Obtener datos del usuario
 input_data = user_input()
 
-# 🎯 Botón para hacer la predicción
+# Botón para hacer la predicción
 if st.button("🔮 Realizar Predicción"):
     if model is not None and scaler is not None:
         try:
-            # 📏 Escalar los datos correctamente
+            # Escalar los datos correctamente
             input_data_scaled = scaler.transform(input_data)
 
-            # 🧠 Realizar la predicción
-            prediction = model.predict(input_data_scaled)[0][0]  # Obtener el valor real
+            # Mostrar los datos escalados (para depuración)
+            st.write("📏 Datos escalados para la predicción:")
+            st.write(input_data_scaled)
 
-            # 📊 Interpretar la predicción
-            prediction_label = "🔴 Alto Riesgo" if prediction >= 0.5 else "🟢 Bajo Riesgo"
+            # Realizar la predicción
+            prediction = model.predict(input_data_scaled)
 
-            # 🔍 Mostrar resultados
+            # Mostrar la salida del modelo (para depuración)
+            st.write("🧠 Salida del modelo (predicción):")
+            st.write(prediction)
+
+            # Interpretar la predicción
+            if isinstance(prediction, np.ndarray):
+                prediction_value = prediction[0][0] if prediction.shape[1] > 1 else prediction[0]
+            else:
+                prediction_value = prediction
+
+            # Clasificar el riesgo
+            prediction_label = "🔴 Alto Riesgo" if prediction_value >= 0.5 else "🟢 Bajo Riesgo"
+
+            # Mostrar resultados
             st.subheader("📌 Resultado de la Predicción:")
             st.markdown(f"## {prediction_label}")
-            st.write(f"📊 Valor de predicción: {prediction:.4f}")
+            st.write(f"📊 Valor de predicción: {prediction_value:.4f}")
 
         except Exception as e:
             st.error(f"⚠️ Error en la predicción: {e}")
     else:
         st.error("⚠️ No se pudo cargar el modelo y/o el scaler.")
-
