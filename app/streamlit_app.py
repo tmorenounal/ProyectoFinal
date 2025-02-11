@@ -524,3 +524,4 @@ if st.button("🔮 Realizar Predicción"):
             st.error(f"⚠️ Error en la predicción: {e}")
     else:
         st.error("⚠️ No se pudo cargar el modelo y/o el scaler.")
+
