@@ -415,6 +415,11 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 
 ####################################################
 
+import streamlit as st
+import gzip
+import pickle
+import numpy as np
+
 st.title("Predicción de Riesgo Cardiovascular")
 
 # Cargar modelo desde archivo comprimido
@@ -428,17 +433,18 @@ def load_model():
         if isinstance(data, dict):
             model = data.get("modelo", None)  # Extraer modelo
             scaler = data.get("scaler", None)  # Extraer scaler
+            hyperparams = data.get("hyperparams", None)  # Extraer hiperparámetros
             if model is None or scaler is None:
                 raise ValueError("El archivo no contiene el modelo o el scaler.")
-            return model, scaler
+            return model, scaler, hyperparams
         else:
             raise ValueError("El archivo no tiene el formato esperado.")
     except Exception as e:
         st.error(f"Error al cargar el modelo: {e}")
-        return None, None
+        return None, None, None
 
 # Cargar el modelo y el scaler
-model, scaler = load_model()
+model, scaler, hyperparams = load_model()
 
 # Función para ingresar datos del usuario con valores predeterminados y escalas correctas
 def user_input():
@@ -480,20 +486,24 @@ if st.button("Realizar Predicción"):
         try:
             # Escalar los datos con el scaler cargado desde el modelo
             input_data_scaled = scaler.transform(input_data)
-
-            # Mostrar los datos escalados (para depuración)
-            st.write("Datos escalados para la predicción:")
-            st.write(input_data_scaled)
-
+            
             # Realizar la predicción
             prediction = model.predict(input_data_scaled)
-
+            
             # Mostrar el resultado de la predicción
             prediction_label = "🔴 Alto Riesgo" if prediction[0] >= 0.5 else "🟢 Bajo Riesgo"
             st.subheader("Resultado de la Predicción:")
             st.markdown(f"## {prediction_label}")
 
+            # Mostrar información sobre el modelo
+            st.markdown("### Información del Modelo")
+            st.write("Este modelo fue entrenado utilizando TensorFlow/Keras y optimizado con WandB para la mejor selección de hiperparámetros."
+                     " Se evaluó en términos de precisión y recall para garantizar un equilibrio adecuado entre sensibilidad y especificidad.")
+            if hyperparams:
+                st.write("**Hiperparámetros ajustados:**", hyperparams)
+
         except Exception as e:
             st.error(f"Error en la predicción: {e}")
     else:
         st.error("No se pudo cargar el modelo y/o el scaler.")
+
