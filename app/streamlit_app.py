@@ -474,25 +474,31 @@ input_data = user_input()
 if st.button("🔮 Realizar Predicción"):
     if model is not None and scaler is not None:
         try:
-            # Escalar solo las columnas numéricas que requieren escalado
-            input_data_scaled = input_data.copy()
-            input_data_scaled[:, 1:] = scaler.transform(input_data[:, 1:])
+            # Verificar dimensiones esperadas por el scaler
+            expected_features = scaler.n_features_in_
+            actual_features = input_data.shape[1]
+            if actual_features != expected_features:
+                st.error(f"⚠️ Error: El modelo espera {expected_features} características, pero se proporcionaron {actual_features}.")
+            else:
+                # Escalar todas las características correctamente
+                input_data_scaled = scaler.transform(input_data)
 
-            # Realizar la predicción
-            prediction = model.predict(input_data_scaled)
+                # Realizar la predicción
+                prediction = model.predict(input_data_scaled)
 
-            # Manejo seguro de la salida
-            prediction_value = float(prediction[0]) if isinstance(prediction, np.ndarray) else float(prediction)
+                # Manejo seguro de la salida
+                prediction_value = float(prediction[0]) if isinstance(prediction, np.ndarray) else float(prediction)
 
-            # Clasificar el riesgo
-            prediction_label = "🔴 Alto Riesgo" if prediction_value >= 0.5 else "🟢 Bajo Riesgo"
+                # Clasificar el riesgo
+                prediction_label = "🔴 Alto Riesgo" if prediction_value >= 0.5 else "🟢 Bajo Riesgo"
 
-            # Mostrar resultados
-            st.subheader("📌 Resultado de la Predicción:")
-            st.markdown(f"## {prediction_label}")
-            st.write(f"📊 Valor de predicción: {prediction_value:.4f}")
+                # Mostrar resultados
+                st.subheader("📌 Resultado de la Predicción:")
+                st.markdown(f"## {prediction_label}")
+                st.write(f"📊 Valor de predicción: {prediction_value:.4f}")
 
         except Exception as e:
             st.error(f"⚠️ Error en la predicción: {e}")
     else:
         st.error("⚠️ No se pudo cargar el modelo y/o el scaler.")
+
