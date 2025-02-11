@@ -420,6 +420,13 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 
 ####################################################
 
+import streamlit as st
+import numpy as np
+import pickle
+import gzip
+from sklearn.preprocessing import StandardScaler
+
+# Título de la aplicación
 st.title("Predicción de Riesgo Cardiovascular")
 
 # Cargar modelo desde archivo comprimido
@@ -454,18 +461,18 @@ def user_input():
     fto_aditivo = st.selectbox("FTO Aditivo", [0, 1], index=0)  # Solo permite 0 o 1
 
     # Variables numéricas con rangos específicos
-    edad = st.number_input("Edad", min_value=18, max_value=100, step=1, value=45)
-    leptina = st.number_input("Leptina (ng/mL)", min_value=0.0, max_value=100.0, step=0.1, value=15.2)
-    grasa = st.number_input("Grasa Corporal (%)", min_value=0.0, max_value=100.0, step=0.1, value=22.5)
-    imc = st.number_input("Índice de Masa Corporal (IMC)", min_value=10.0, max_value=50.0, step=0.1, value=27.3)
-    bai = st.number_input("Índice de Adiposidad Corporal (BAI)", min_value=0.0, max_value=50.0, step=0.1, value=25.1)
-    cintura = st.number_input("Circunferencia de Cintura (cm)", min_value=30.0, max_value=200.0, step=0.1, value=92.4)
-    cadera = st.number_input("Circunferencia de Cadera (cm)", min_value=30.0, max_value=200.0, step=0.1, value=100.2)
-    cvldl = st.number_input("Colesterol VLDL (mg/dL)", min_value=0.0, max_value=200.0, step=0.1, value=24.0)
-    triglic = st.number_input("Triglicéridos (mg/dL)", min_value=0.0, max_value=500.0, step=0.1, value=130.5)
-    ctotal = st.number_input("Colesterol Total (mg/dL)", min_value=0.0, max_value=400.0, step=0.1, value=210.8)
-    cldl = st.number_input("Colesterol LDL (mg/dL)", min_value=0.0, max_value=300.0, step=0.1, value=140.3)
-    chdl = st.number_input("Colesterol HDL (mg/dL)", min_value=0.0, max_value=100.0, step=0.1, value=48.2)
+    edad = st.number_input("Edad", min_value=18, max_value=100, step=1, value=60)
+    leptina = st.number_input("Leptina (ng/mL)", min_value=0.0, max_value=100.0, step=0.1, value=30.0)
+    grasa = st.number_input("Grasa Corporal (%)", min_value=0.0, max_value=100.0, step=0.1, value=35.0)
+    imc = st.number_input("Índice de Masa Corporal (IMC)", min_value=10.0, max_value=50.0, step=0.1, value=32.0)
+    bai = st.number_input("Índice de Adiposidad Corporal (BAI)", min_value=0.0, max_value=50.0, step=0.1, value=30.0)
+    cintura = st.number_input("Circunferencia de Cintura (cm)", min_value=30.0, max_value=200.0, step=0.1, value=110.0)
+    cadera = st.number_input("Circunferencia de Cadera (cm)", min_value=30.0, max_value=200.0, step=0.1, value=120.0)
+    cvldl = st.number_input("Colesterol VLDL (mg/dL)", min_value=0.0, max_value=200.0, step=0.1, value=50.0)
+    triglic = st.number_input("Triglicéridos (mg/dL)", min_value=0.0, max_value=500.0, step=0.1, value=250.0)
+    ctotal = st.number_input("Colesterol Total (mg/dL)", min_value=0.0, max_value=400.0, step=0.1, value=280.0)
+    cldl = st.number_input("Colesterol LDL (mg/dL)", min_value=0.0, max_value=300.0, step=0.1, value=180.0)
+    chdl = st.number_input("Colesterol HDL (mg/dL)", min_value=0.0, max_value=100.0, step=0.1, value=35.0)
 
     # Codificar el sexo como binario
     sexo_binario = 1 if sexo == "Masculino" else 0
@@ -486,6 +493,10 @@ if st.button("Realizar Predicción"):
             # Escalar los datos con el scaler cargado desde el modelo
             input_data_scaled = scaler.transform(input_data)
 
+            # Mostrar los datos escalados (para depuración)
+            st.write("Datos escalados para la predicción:")
+            st.write(input_data_scaled)
+
             # Realizar la predicción
             prediction = model.predict(input_data_scaled)
 
@@ -493,7 +504,6 @@ if st.button("Realizar Predicción"):
             prediction_label = "🔴 Alto Riesgo" if prediction[0] >= 0.5 else "🟢 Bajo Riesgo"
             st.subheader("Resultado de la Predicción:")
             st.markdown(f"## {prediction_label}")
-
 
         except Exception as e:
             st.error(f"Error en la predicción: {e}")
