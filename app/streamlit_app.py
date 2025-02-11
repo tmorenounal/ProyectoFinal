@@ -494,7 +494,7 @@ if st.button(" Realizar Predicción"):
 
                 # Mostrar resultados
                 st.subheader("📌 Resultado de la Predicción:")
-                
+                st.markdown(f"## {prediction_label}")
                
 
         except Exception as e:
