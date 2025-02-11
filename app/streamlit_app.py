@@ -497,6 +497,12 @@ if st.button("🔮 Realizar Predicción"):
             st.write("🧠 Salida del modelo (predicción, sin procesar):")
             st.write(prediction)
 
+            # Forzar predicciones manuales con valores extremos
+            extreme_input = np.array([[1, 100, 100, 100, 50, 50, 200, 200, 200, 500, 400, 300, 100, 1]], dtype=np.float32)
+            extreme_input_scaled = scaler.transform(extreme_input)
+            extreme_prediction = model.predict(extreme_input_scaled).flatten()
+            st.write("🚨 Predicción con valores extremos (depuración):", extreme_prediction)
+
             # Manejar salida de softmax o sigmoid
             if prediction.shape[0] > 1:  # Softmax (varias clases)
                 predicted_class = np.argmax(prediction)  # Clase con mayor probabilidad
@@ -518,3 +524,4 @@ if st.button("🔮 Realizar Predicción"):
             st.error(f"⚠️ Error en la predicción: {e}")
     else:
         st.error("⚠️ No se pudo cargar el modelo y/o el scaler.")
+
