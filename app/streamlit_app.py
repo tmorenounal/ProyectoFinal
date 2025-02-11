@@ -490,12 +490,12 @@ if st.button("🔮 Realizar Predicción"):
                 prediction_value = float(prediction[0]) if isinstance(prediction, np.ndarray) else float(prediction)
 
                 # Clasificar el riesgo
-                prediction_label = "🔴 Alto Riesgo" if prediction_value >= 0.5 else "🟢 Bajo Riesgo"
+                prediction_label = "🟢 Bajo Riesgo" if prediction_value >= 0.5 else "🔴 Alto Riesgo"
 
                 # Mostrar resultados
                 st.subheader("📌 Resultado de la Predicción:")
                 st.markdown(f"## {prediction_label}")
-                st.write(f"📊 Valor de predicción: {prediction_value:.4f}")
+               
 
         except Exception as e:
             st.error(f"⚠️ Error en la predicción: {e}")
