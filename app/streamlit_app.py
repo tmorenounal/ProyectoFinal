@@ -415,11 +415,6 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 
 ####################################################
 
-import streamlit as st
-import gzip
-import pickle
-import numpy as np
-
 st.title("Predicción de Riesgo Cardiovascular")
 
 # Cargar modelo desde archivo comprimido
@@ -487,23 +482,21 @@ if st.button("Realizar Predicción"):
             # Escalar los datos con el scaler cargado desde el modelo
             input_data_scaled = scaler.transform(input_data)
             
+            # Mostrar los datos escalados
+            st.write("Datos escalados para la predicción:")
+            st.write(input_data_scaled)
+            
             # Realizar la predicción
             prediction = model.predict(input_data_scaled)
             
             # Mostrar el resultado de la predicción
+            st.write("Salida del modelo (probabilidad):", prediction[0])
+            
             prediction_label = "🔴 Alto Riesgo" if prediction[0] >= 0.5 else "🟢 Bajo Riesgo"
             st.subheader("Resultado de la Predicción:")
             st.markdown(f"## {prediction_label}")
-
-            # Mostrar información sobre el modelo
-            st.markdown("### Información del Modelo")
-            st.write("Este modelo fue entrenado utilizando TensorFlow/Keras y optimizado con WandB para la mejor selección de hiperparámetros."
-                     " Se evaluó en términos de precisión y recall para garantizar un equilibrio adecuado entre sensibilidad y especificidad.")
-            if hyperparams:
-                st.write("**Hiperparámetros ajustados:**", hyperparams)
 
         except Exception as e:
             st.error(f"Error en la predicción: {e}")
     else:
         st.error("No se pudo cargar el modelo y/o el scaler.")
-
