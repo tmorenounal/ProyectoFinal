@@ -428,7 +428,7 @@ def load_model():
     """Carga el modelo y el scaler desde un archivo comprimido."""
     try:
         with gzip.open("modelo_entrenado.pkl.gz", "rb") as f:
-            data = pickle.load(f)  # Cargar modelo y scaler
+            data = pickle.load(f)
 
         if isinstance(data, dict):
             model = data.get("modelo", None)
@@ -453,7 +453,7 @@ def user_input():
     sexo = st.selectbox("Sexo", ["Femenino", "Masculino"], index=1)  # Predeterminado: Masculino
     fto_aditivo = st.selectbox("FTO Aditivo", [0, 1], index=1)  # Valor de riesgo: 1
 
-    # Variables numéricas con valores altos para predecir ALTO RIESGO
+    # Variables numéricas con valores críticos para ALTO RIESGO
     edad = st.number_input("Edad", min_value=18, max_value=100, step=1, value=70)
     leptina = st.number_input("Leptina (ng/mL)", min_value=0.0, max_value=100.0, step=0.1, value=60.0)
     grasa = st.number_input("Grasa Corporal (%)", min_value=0.0, max_value=100.0, step=0.1, value=45.0)
@@ -497,17 +497,10 @@ if st.button("🚀 Realizar Predicción"):
             else:
                 st.markdown("## 🟢 **Bajo Riesgo**")
 
-            # Mostrar el valor de predicción (para ver qué tan cerca estuvo del umbral)
+            # Mostrar el valor de predicción
             st.write(f"📊 **Valor de predicción:** {prediction[0]:.4f}")
 
         except Exception as e:
             st.error(f"⚠️ Error en la predicción: {e}")
     else:
         st.error("⚠️ No se pudo cargar el modelo y/o el scaler.")
-
-
-        except Exception as e:
-            st.error(f"Error en la predicción: {e}")
-    else:
-        st.error("No se pudo cargar el modelo y/o el scaler.")
-
