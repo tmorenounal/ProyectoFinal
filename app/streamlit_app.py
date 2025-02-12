@@ -839,74 +839,81 @@ st.title("Predicción de Riesgo Cardiovascular")
 def load_model():
     """Carga el modelo y el scaler desde un archivo comprimido."""
     try:
-        with gzip.open("best_model.pkl.gz", "rb") as f:
-            data = pickle.load(f)  # Carga el diccionario con el modelo y scaler
+        with gzip.open("modelo_entrenado.pkl.gz", "rb") as f:
+            data = pickle.load(f)
 
-        if isinstance(data, dict):
-            model = data.get("modelo", None)  # Extraer modelo
-            scaler = data.get("scaler", None)  # Extraer scaler
-            if model is None or scaler is None:
-                raise ValueError("El archivo no contiene el modelo o el scaler.")
-            return model, scaler
+        if isinstance(data, dict) and "modelo" in data and "scaler" in data:
+            return data["modelo"], data["scaler"]
         else:
             raise ValueError("El archivo no tiene el formato esperado.")
     except Exception as e:
         st.error(f"Error al cargar el modelo: {e}")
         return None, None
 
-# Cargar el modelo y el scaler
+# Cargar modelo y scaler
 model, scaler = load_model()
 
-# Función para ingresar datos del usuario con valores predeterminados y escalas ajustadas
+# Función para ingresar datos del usuario
 def user_input():
-    st.sidebar.header("Ingresar Datos del Paciente")
+    st.header("📋 Ingresar Datos del Paciente")
 
     # Variables categóricas
-    sexo = st.sidebar.selectbox("Sexo", ["Femenino", "Masculino"], index=1)  # Predeterminado: Masculino
-    fto_aditivo = st.sidebar.selectbox("FTO Aditivo", [0, 1], index=0)  # Solo permite 0 o 1
+    sexo = st.selectbox("Sexo", ["Femenino", "Masculino"], index=1)
+    fto_aditivo = st.selectbox("FTO Aditivo", [0, 1], index=0)
 
-    # Variables numéricas con rangos específicos
-    edad = st.sidebar.number_input("Edad", min_value=18, max_value=100, step=1, value=45)
-    leptina = st.sidebar.number_input("Leptina (ng/mL)", min_value=0.0, max_value=100.0, step=0.1, value=15.2)
-    grasa = st.sidebar.number_input("Grasa Corporal (%)", min_value=0.0, max_value=100.0, step=0.1, value=22.5)
-    imc = st.sidebar.number_input("Índice de Masa Corporal (IMC)", min_value=10.0, max_value=50.0, step=0.1, value=27.3)
-    bai = st.sidebar.number_input("Índice de Adiposidad Corporal (BAI)", min_value=0.0, max_value=50.0, step=0.1, value=25.1)
-    cintura = st.sidebar.number_input("Circunferencia de Cintura (cm)", min_value=30.0, max_value=200.0, step=0.1, value=92.4)
-    cadera = st.sidebar.number_input("Circunferencia de Cadera (cm)", min_value=30.0, max_value=200.0, step=0.1, value=100.2)
-    cvldl = st.sidebar.number_input("Colesterol VLDL (mg/dL)", min_value=0.0, max_value=200.0, step=0.1, value=24.0)
-    triglic = st.sidebar.number_input("Triglicéridos (mg/dL)", min_value=0.0, max_value=500.0, step=0.1, value=130.5)
-    ctotal = st.sidebar.number_input("Colesterol Total (mg/dL)", min_value=0.0, max_value=400.0, step=0.1, value=210.8)
-    cldl = st.sidebar.number_input("Colesterol LDL (mg/dL)", min_value=0.0, max_value=300.0, step=0.1, value=140.3)
-    chdl = st.sidebar.number_input("Colesterol HDL (mg/dL)", min_value=0.0, max_value=100.0, step=0.1, value=48.2)
+    # Variables numéricas con validación de rango
+    edad = st.number_input("Edad", min_value=18, max_value=100, value=60, step=1)
+    leptina = st.number_input("Leptina (ng/mL)", min_value=0.0, max_value=100.0, value=30.0, step=0.1)
+    grasa = st.number_input("Grasa Corporal (%)", min_value=0.0, max_value=100.0, value=35.0, step=0.1)
+    imc = st.number_input("Índice de Masa Corporal (IMC)", min_value=10.0, max_value=50.0, value=32.0, step=0.1)
+    bai = st.number_input("Índice de Adiposidad Corporal (BAI)", min_value=0.0, max_value=50.0, value=30.0, step=0.1)
+    cintura = st.number_input("Circunferencia de Cintura (cm)", min_value=30.0, max_value=200.0, value=110.0, step=0.1)
+    cadera = st.number_input("Circunferencia de Cadera (cm)", min_value=30.0, max_value=200.0, value=120.0, step=0.1)
+    cvldl = st.number_input("Colesterol VLDL (mg/dL)", min_value=0.0, max_value=200.0, value=50.0, step=0.1)
+    triglic = st.number_input("Triglicéridos (mg/dL)", min_value=0.0, max_value=500.0, value=250.0, step=0.1)
+    ctotal = st.number_input("Colesterol Total (mg/dL)", min_value=0.0, max_value=400.0, value=280.0, step=0.1)
+    cldl = st.number_input("Colesterol LDL (mg/dL)", min_value=0.0, max_value=300.0, value=180.0, step=0.1)
+    chdl = st.number_input("Colesterol HDL (mg/dL)", min_value=0.0, max_value=100.0, value=35.0, step=0.1)
 
-    # Codificar el sexo como binario
+    # Convertir sexo a variable binaria (0 = Femenino, 1 = Masculino)
     sexo_binario = 1 if sexo == "Masculino" else 0
 
     # Crear un array con los datos ingresados
     data = np.array([[sexo_binario, edad, leptina, grasa, imc, bai, cintura, cadera, 
                       cvldl, triglic, ctotal, cldl, chdl, fto_aditivo]], dtype=np.float32)
-
     return data
 
 # Obtener datos del usuario
 input_data = user_input()
 
 # Botón para hacer la predicción
-if st.sidebar.button("Realizar Predicción"):
+if st.button(" Realizar Predicción"):
     if model is not None and scaler is not None:
         try:
-            # Escalar los datos con el scaler cargado desde el modelo
-            input_data_scaled = scaler.transform(input_data)
+            # Verificar dimensiones esperadas por el scaler
+            expected_features = scaler.n_features_in_
+            actual_features = input_data.shape[1]
+            if actual_features != expected_features:
+                st.error(f"⚠️ Error: El modelo espera {expected_features} características, pero se proporcionaron {actual_features}.")
+            else:
+                # Escalar todas las características correctamente
+                input_data_scaled = scaler.transform(input_data)
 
-            # Realizar la predicción
-            prediction = model.predict(input_data_scaled)
+                # Realizar la predicción
+                prediction = model.predict(input_data_scaled)
 
-            # Mostrar el resultado de la predicción
-            prediction_label = "🔴 Alto Riesgo" if prediction[0] >= 0.5 else "🟢 Bajo Riesgo"
-            st.subheader("Resultado de la Predicción:")
-            st.markdown(f"## {prediction_label}")
+                # Manejo seguro de la salida
+                prediction_value = float(prediction[0]) if isinstance(prediction, np.ndarray) else float(prediction)
+
+                # Clasificar el riesgo
+                prediction_label = "🟢 Bajo Riesgo" if prediction_value >= 0.5 else "🔴 Alto Riesgo"
+
+                # Mostrar resultados
+                st.subheader("📌 Resultado de la Predicción:")
+                st.markdown(f"## {prediction_label}")
+               
 
         except Exception as e:
-            st.error(f"Error en la predicción: {e}")
+            st.error(f"⚠️ Error en la predicción: {e}")
     else:
-        st.error("No se pudo cargar el modelo y/o el scaler.")
+        st.error("⚠️ No se pudo cargar el modelo y/o el scaler.")
