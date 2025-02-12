@@ -445,22 +445,21 @@ if st.button("Predecir"):
     modelo_cargado = keras.models.load_model("modelo_riesgo.h5")
     scaler_cargado = joblib.load("scaler.pkl")
 
-    # Convertir inputs en DataFrame
+    # Convertir inputs a DataFrame
     X_nuevo = pd.DataFrame([inputs])
 
-    # Verificar nombres de columnas en scaler
-    st.write("Características esperadas por scaler:", scaler_cargado.feature_names_in_)
-    st.write("Características ingresadas:", list(X_nuevo.columns))
+    # 📌 Depuración: Imprimir columnas esperadas y reales
+    st.write("🔍 Características esperadas por scaler:", scaler_cargado.feature_names_in_)
+    st.write("🔍 Características ingresadas:", list(X_nuevo.columns))
 
-    # Asegurar que las columnas coincidan
+    # Asegurar que las columnas coincidan con el scaler
     X_nuevo = X_nuevo[scaler_cargado.feature_names_in_]
 
-    # Aplicar transformación
+    # Transformar los datos con el scaler
     X_nuevo = scaler_cargado.transform(X_nuevo)
 
     # Realizar predicción
     prediccion = modelo_cargado.predict(X_nuevo)[0][0]
     riesgo = "Alto" if prediccion > 0.5 else "Bajo"
-    st.write(f"Riesgo cardiovascular: {riesgo} (Probabilidad: {prediccion:.2f})")
-
+    st.write(f"⚠️ Riesgo cardiovascular: {riesgo} (Probabilidad: {prediccion:.2f})")
 
