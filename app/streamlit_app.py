@@ -16,9 +16,6 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import SGD
 
-# =====================================================================
-# Sidebar de navegación (se define UNA sola vez, con claves únicas)
-# =====================================================================
 
 st.sidebar.title("Navegación")
 st.sidebar.markdown("---")
@@ -54,9 +51,7 @@ with st.sidebar.expander("Predicciones", expanded=True):
         key="predicciones_radio"  # clave única asignada
     )
 
-# =====================================================================
-# Carga y preprocesamiento de datos
-# =====================================================================
+
 
 @st.cache_data
 def load_data():
@@ -95,9 +90,7 @@ umbral = data['Riesgo_Cardiovascular'].max() * 0.5  # Ajustar según necesidad
 # Crear variable binaria de riesgo cardiovascular
 data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > umbral).astype(int)
 
-# =====================================================================
-# Visualización y Análisis Exploratorio
-# =====================================================================
+
 
 st.title('Análisis de Enfermedades Cardiovasculares en la Población Indígena Xavante de Brasil')
 st.write("""
@@ -188,9 +181,7 @@ sns.heatmap(data.corr(), annot=True, cmap='coolwarm', ax=ax)
 ax.set_title('Matriz de Correlación')
 st.pyplot(fig)
 
-# =====================================================================
-# Preprocesamiento para Modelado y División de Datos
-# =====================================================================
+
 
 def preprocess_data(data):
     # Asegurarse de que los nombres de las columnas coincidan con los del archivo
@@ -209,9 +200,7 @@ except KeyError as e:
 
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, random_state=42)
 
-# =====================================================================
-# Funciones de Visualización para Reducción de Dimensionalidad y ROC
-# =====================================================================
+
 
 def plot_dimension_reduction(X_pca, X_tsne, y, title_pca, title_tsne):
     fig, ax = plt.subplots(1, 2, figsize=(12, 5))
@@ -233,9 +222,7 @@ def plot_roc_curve(y_true, y_pred_proba, title):
     plt.legend(loc='lower right')
     st.pyplot(plt)
 
-# =====================================================================
-# Reducción de Dimensionalidad
-# =====================================================================
+
 
 st.write("### Reducción de Dimensionalidad")
 pca = PCA(n_components=2)
@@ -244,9 +231,7 @@ tsne = TSNE(n_components=2, random_state=42)
 X_tsne = tsne.fit_transform(X_scaled)
 plot_dimension_reduction(X_pca, X_tsne, y, 'PCA - Datos Originales', 't-SNE - Datos Originales')
 
-# =====================================================================
-# Entrenamiento y Evaluación de Modelos
-# =====================================================================
+
 
 st.write("## Modelos Ajustados")
 
@@ -380,9 +365,7 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
     La red neuronal con {name} logra una precisión del {accuracy_nn:.2f}. La curva ROC presenta un AUC de {auc(roc_curve(y_test, y_pred_proba_nn)[0], roc_curve(y_test, y_pred_proba_nn)[1]):.2f}.
     """)
 
-# =====================================================================
-# Sección de Predicción
-# =====================================================================
+
 
 st.title("Predicción de Riesgo Cardiovascular")
 
@@ -403,7 +386,7 @@ def load_model():
 model, scaler = load_model()
 
 def user_input():
-    st.header("📋 Ingresar Datos del Paciente")
+    st.header(" Ingresar Datos")
 
     # Variables categóricas
     sexo = st.selectbox("Sexo", ["Femenino", "Masculino"], index=1)
