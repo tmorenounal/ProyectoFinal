@@ -832,68 +832,7 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 
 ####################################################
     
-   import streamlit as st
-import pandas as pd
-import numpy as np
-import tensorflow as tf
-from tensorflow import keras
-from sklearn.preprocessing import StandardScaler
-import joblib
-import zipfile
 
-# Cargar datos
-@st.cache_data
-def load_data(file):
-    return pd.read_excel(file)
-
-data_file = st.file_uploader("Sube el archivo de datos", type=["xlsx"])
-if data_file is not None:
-    data = load_data(data_file)
-    st.write("Vista previa de los datos:")
-    st.write(data.head())
-    
-    # Definir pesos para calcular el índice de riesgo cardiovascular
-    pesos = {
-        'CTOTAL': 0.2, 'CLDL': 0.3, 'CHDL': -0.2, 'Triglic': 0.2, 'CVLDL': 0.1,
-        'IMC': 0.15, 'BAI': 0.1, 'Cintura': 0.15, 'Cadera': -0.1, 'Grasa': 0.1,
-        'Edad': 0.2, 'Leptina': 0.05, 'FTO_Aditivo': 0.05
-    }
-    
-    # Verificar columnas
-    missing_columns = [col for col in pesos.keys() if col not in data.columns]
-    if missing_columns:
-        st.error(f"Faltan las siguientes columnas: {missing_columns}")
-        st.stop()
-    
-    # Calcular índice de riesgo cardiovascular
-    data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
-    umbral = data['Riesgo_Cardiovascular'].max() * 0.5
-    data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > umbral).astype(int)
-    
-    # Escalar los datos
-    scaler = StandardScaler()
-    X = scaler.fit_transform(data[list(pesos.keys())])
-    y = data['Riesgo_Cardiovascular_Binario'].values
-    joblib.dump(scaler, "scaler.pkl")
-    
-    # Definir modelo de red neuronal
-    model = keras.Sequential([
-        keras.layers.Dense(16, activation='relu', input_shape=(X.shape[1],)),
-        keras.layers.Dense(8, activation='relu'),
-        keras.layers.Dense(1, activation='sigmoid')
-    ])
-    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-    
-    # Entrenar modelo
-    model.fit(X, y, epochs=50, batch_size=16, verbose=1, validation_split=0.2)
-    model.save("modelo_riesgo.h5")
-    
-    # Comprimir el modelo entrenado
-    with zipfile.ZipFile("modelo_riesgo.zip", "w") as zipf:
-        zipf.write("modelo_riesgo.h5")
-        zipf.write("scaler.pkl")
-    
-    st.success("Modelo entrenado, guardado y comprimido correctamente.")
     
     # Sección de predicción con datos predefinidos
     st.subheader("Predicción de riesgo cardiovascular")
