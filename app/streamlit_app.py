@@ -422,9 +422,25 @@ import tensorflow as tf
 from tensorflow import keras
 import joblib
 
+# Cargar modelo desde archivo comprimido
+@st.cache_resource
+def load_model():
+    """Carga el modelo y el scaler desde un archivo comprimido."""
+    try:
+        with gzip.open("modelo_entrenado.pkl.gz", "rb") as f:
+            data = pickle.load(f)
+
+        if isinstance(data, dict) and "modelo" in data and "scaler" in data:
+            return data["modelo"], data["scaler"]
+        else:
+            raise ValueError("El archivo no tiene el formato esperado.")
+    except Exception as e:
+        st.error(f"Error al cargar el modelo: {e}")
+        return None, None
+
 # Cargar modelo y scaler
-modelo = keras.models.load_model("modelo_riesgo.h5")
-scaler = joblib.load("scaler.pkl")
+model, scaler = load_model()
+
 
 st.title("Clasificación de Riesgo Cardiovascular")
 
