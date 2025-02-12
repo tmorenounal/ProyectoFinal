@@ -416,7 +416,7 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 ####################################################
 
 
-    # Sección de predicción con datos predefinidos
+   # Sección de predicción con datos predefinidos
     st.subheader("Predicción de riesgo cardiovascular")
     
     datos_predeterminados = {
@@ -437,7 +437,7 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
         X_nuevo = pd.DataFrame([inputs])  
         
         # Reordenar las columnas para que coincidan con las del scaler
-        X_nuevo = X_nuevo[scaler_cargado.feature_names_in_]  
+        X_nuevo = X_nuevo.reindex(columns=scaler_cargado.feature_names_in_, fill_value=0)
         
         # Mostrar debug
         st.write("📌 Características esperadas por el scaler:", scaler_cargado.feature_names_in_)
