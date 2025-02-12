@@ -442,8 +442,25 @@ for col, valor in datos_predeterminados.items():
 
 # Botón de predicción
 if st.button("Predecir"):
-    X_nuevo = scaler.transform(np.array([list(inputs.values())]))
-    prediccion = modelo.predict(X_nuevo)[0][0]
+    modelo_cargado = keras.models.load_model("modelo_riesgo.h5")
+    scaler_cargado = joblib.load("scaler.pkl")
+
+    # Convertir inputs en DataFrame
+    X_nuevo = pd.DataFrame([inputs])
+
+    # Verificar nombres de columnas en scaler
+    st.write("Características esperadas por scaler:", scaler_cargado.feature_names_in_)
+    st.write("Características ingresadas:", list(X_nuevo.columns))
+
+    # Asegurar que las columnas coincidan
+    X_nuevo = X_nuevo[scaler_cargado.feature_names_in_]
+
+    # Aplicar transformación
+    X_nuevo = scaler_cargado.transform(X_nuevo)
+
+    # Realizar predicción
+    prediccion = modelo_cargado.predict(X_nuevo)[0][0]
     riesgo = "Alto" if prediccion > 0.5 else "Bajo"
     st.write(f"Riesgo cardiovascular: {riesgo} (Probabilidad: {prediccion:.2f})")
+
 
