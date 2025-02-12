@@ -94,12 +94,6 @@ data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > data['R
 # Calcular el índice de riesgo cardiovascular
 data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
 
-# Calcular el índice de riesgo cardiovascular
-data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
-
-# Calcular el índice de riesgo cardiovascular
-data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
-
 # Definir un umbral fijo basado en una fracción del máximo
 umbral = data['Riesgo_Cardiovascular'].max() * 0.5  # Ajustar según necesidad
 
