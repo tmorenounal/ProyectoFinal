@@ -831,20 +831,18 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
     """)
 
 ####################################################
-import streamlit as st
-import numpy as np
-import pickle
-import gzip
-
-# Título de la aplicación
-st.title("Predicción de Riesgo Cardiovascular")
-
 # Cargar modelo desde archivo comprimido
 @st.cache_resource
 def load_model():
     """Carga el modelo y el scaler desde un archivo comprimido."""
+    modelo_path = "modelo_entrenado.pkl.gz"
+
+    if not os.path.exists(modelo_path):
+        st.error("⚠️ El archivo del modelo no se encuentra.")
+        return None, None
+
     try:
-        with gzip.open("modelo_entrenado.pkl.gz", "rb") as f:
+        with gzip.open(modelo_path, "rb") as f:
             data = pickle.load(f)
 
         if isinstance(data, dict) and "modelo" in data and "scaler" in data:
@@ -854,7 +852,7 @@ def load_model():
         else:
             raise ValueError("El archivo no tiene el formato esperado.")
     except Exception as e:
-        st.error(f"Error al cargar el modelo: {e}")
+        st.error(f"⚠️ Error al cargar el modelo: {e}")
         return None, None
 
 # Cargar modelo y scaler
@@ -898,6 +896,12 @@ input_data = user_input()
 if st.button("🔮 Realizar Predicción"):
     if model is not None and scaler is not None:
         try:
+            # Verificar que el input tenga el mismo número de características que el scaler espera
+            expected_features = scaler.feature_names_in_
+            if input_data.shape[1] != len(expected_features):
+                st.error(f"⚠️ Número de características incorrecto. Se esperaban {len(expected_features)}, pero se recibieron {input_data.shape[1]}.")
+                st.stop()
+
             # Escalar los datos correctamente
             input_data_scaled = scaler.transform(input_data)
 
@@ -913,10 +917,7 @@ if st.button("🔮 Realizar Predicción"):
             st.write(prediction)
 
             # Interpretar la predicción
-            if isinstance(prediction, np.ndarray):
-                prediction_value = prediction[0][0] if prediction.shape[1] > 1 else prediction[0]
-            else:
-                prediction_value = prediction
+            prediction_value = prediction[0][0] if prediction.ndim == 2 else prediction[0]
 
             # Clasificar el riesgo
             prediction_label = "🔴 Alto Riesgo" if prediction_value >= 0.5 else "🟢 Bajo Riesgo"
@@ -930,4 +931,5 @@ if st.button("🔮 Realizar Predicción"):
             st.error(f"⚠️ Error en la predicción: {e}")
     else:
         st.error("⚠️ No se pudo cargar el modelo y/o el scaler.")
+
 
