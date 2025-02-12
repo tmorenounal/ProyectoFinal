@@ -94,6 +94,12 @@ data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > data['R
 # Calcular el índice de riesgo cardiovascular
 data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
 
+# Calcular el índice de riesgo cardiovascular
+data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
+
+# Calcular el índice de riesgo cardiovascular
+data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
+
 # Definir un umbral fijo basado en una fracción del máximo
 umbral = data['Riesgo_Cardiovascular'].max() * 0.5  # Ajustar según necesidad
 
@@ -110,20 +116,20 @@ La siguiente base de datos pertenece a una población de indígenas Xavantes de 
 la cual cuenta con variables importantes para determinar enfermedades cardiovasculares en la población.  
 La base de datos incluye las siguientes variables:
 
-- **Sexo**: Género de los individuos (hombre o mujer).
-- **Edad**: Edad en años.
-- **Leptina**: Nivel de leptina, una hormona relacionada con la regulación del apetito y el metabolismo.
-- **Grasa**: Porcentaje de grasa corporal.
-- **IMC**: Índice de Masa Corporal, una medida de la relación entre peso y altura.
-- **BAI**: Índice de Adiposidad Corporal, una medida alternativa al IMC.
-- **Cintura**: Circunferencia de la cintura en centímetros.
-- **Cadera**: Circunferencia de la cadera en centímetros.
-- **CVLDL**: Colesterol de lipoproteínas de muy baja densidad.
-- **Triglic**: Nivel de triglicéridos en sangre.
-- **CTOTAL**: Colesterol total.
-- **CLDL**: Colesterol de lipoproteínas de baja densidad (colesterol "malo").
-- **CHDL**: Colesterol de lipoproteínas de alta densidad (colesterol "bueno").
-- **FTO_Aditivo**: Variante genética asociada con la obesidad y el riesgo cardiovascular.
+- *Sexo*: Género de los individuos (hombre o mujer).
+- *Edad*: Edad en años.
+- *Leptina*: Nivel de leptina, una hormona relacionada con la regulación del apetito y el metabolismo.
+- *Grasa*: Porcentaje de grasa corporal.
+- *IMC*: Índice de Masa Corporal, una medida de la relación entre peso y altura.
+- *BAI*: Índice de Adiposidad Corporal, una medida alternativa al IMC.
+- *Cintura*: Circunferencia de la cintura en centímetros.
+- *Cadera*: Circunferencia de la cadera en centímetros.
+- *CVLDL*: Colesterol de lipoproteínas de muy baja densidad.
+- *Triglic*: Nivel de triglicéridos en sangre.
+- *CTOTAL*: Colesterol total.
+- *CLDL*: Colesterol de lipoproteínas de baja densidad (colesterol "malo").
+- *CHDL*: Colesterol de lipoproteínas de alta densidad (colesterol "bueno").
+- *FTO_Aditivo*: Variante genética asociada con la obesidad y el riesgo cardiovascular.
 """)
 
 st.write("### Vista previa de los datos")
@@ -137,24 +143,24 @@ st.write(data.describe())
 st.write("""
 ### Variable Objetivo: Riesgo Cardiovascular
 
-La variable objetivo de este estudio es el **Riesgo Cardiovascular**, que se determina en función de los siguientes criterios clínicos y umbrales establecidos:
+La variable objetivo de este estudio es el *Riesgo Cardiovascular*, que se determina en función de los siguientes criterios clínicos y umbrales establecidos:
 
-- **Colesterol Total (CTOTAL)**: Alto riesgo si **CTOTAL > 200 mg/dL**.
-- **Triglicéridos (Triglic)**: Alto riesgo si **Triglic > 150 mg/dL**.
-- **Colesterol LDL (CLDL)**: Alto riesgo si **CLDL > 130 mg/dL**.
-- **Colesterol HDL (CHDL)**: **Bajo riesgo** si **CHDL < 40 mg/dL (hombres)** o **< 50 mg/dL (mujeres)**.
-- **Índice de Masa Corporal (IMC)**: Alto riesgo si **IMC > 30** (obesidad).
-- **Circunferencia de Cintura**: Alto riesgo si **Cintura > 102 cm (hombres)** o **> 88 cm (mujeres)**.
-- **Relación Cintura-Cadera**: Alto riesgo si **Relación > 0.9 (hombres)** o **> 0.85 (mujeres)**.
+- *Colesterol Total (CTOTAL): Alto riesgo si **CTOTAL > 200 mg/dL*.
+- *Triglicéridos (Triglic): Alto riesgo si **Triglic > 150 mg/dL*.
+- *Colesterol LDL (CLDL): Alto riesgo si **CLDL > 130 mg/dL*.
+- *Colesterol HDL (CHDL): **Bajo riesgo* si *CHDL < 40 mg/dL (hombres)* o *< 50 mg/dL (mujeres)*.
+- *Índice de Masa Corporal (IMC): Alto riesgo si **IMC > 30* (obesidad).
+- *Circunferencia de Cintura: Alto riesgo si **Cintura > 102 cm (hombres)* o *> 88 cm (mujeres)*.
+- *Relación Cintura-Cadera: Alto riesgo si **Relación > 0.9 (hombres)* o *> 0.85 (mujeres)*.
 
 #### Definición de la Variable de Interés:
-- **0 (Bajo riesgo):** El individuo **no cumple con ninguno** de los criterios de alto riesgo.
-- **1 (Alto riesgo):** El individuo **cumple con al menos uno** de los criterios de alto riesgo mencionados anteriormente.
+- *0 (Bajo riesgo):* El individuo *no cumple con ninguno* de los criterios de alto riesgo.
+- *1 (Alto riesgo):* El individuo *cumple con al menos uno* de los criterios de alto riesgo mencionados anteriormente.
 
 Esta variable se calcula automáticamente en el análisis utilizando los umbrales clínicos establecidos.
 """)
 
-st.write(f"Se ha utilizado un umbral de **{umbral:.2f}** basado en el 50% del valor máximo del índice.")
+st.write(f"Se ha utilizado un umbral de *{umbral:.2f}* basado en el 50% del valor máximo del índice.")
 
 # Mostrar el balance de clases
 st.write("#### Balance de Clases en la Variable Objetivo")
@@ -285,15 +291,15 @@ svm_model.fit(X_train, y_train)
 y_pred_svm = svm_model.predict(X_test)
 y_pred_proba_svm = svm_model.predict_proba(X_test)[:, 1]
 accuracy_svm = accuracy_score(y_test, y_pred_svm)
-st.write(f"**Precisión (SVM):** {accuracy_svm:.2f}")
-st.write("**Matriz de Confusión (SVM):**")
+st.write(f"*Precisión (SVM):* {accuracy_svm:.2f}")
+st.write("*Matriz de Confusión (SVM):*")
 st.write(confusion_matrix(y_test, y_pred_svm))
-st.write("**Informe de Clasificación (SVM):**")
+st.write("*Informe de Clasificación (SVM):*")
 st.write(classification_report(y_test, y_pred_svm))
 plot_roc_curve(y_test, y_pred_proba_svm, 'Curva ROC - SVM (Datos Originales)')
 
 st.write("""
-**Conclusión:**
+*Conclusión:*
 El modelo SVM con datos originales logra una precisión del {:.2f}. La matriz de confusión muestra un buen equilibrio entre verdaderos positivos y falsos positivos. La curva ROC con un AUC de {:.2f} indica un buen rendimiento en la clasificación.
 """.format(accuracy_svm, auc(roc_curve(y_test, y_pred_proba_svm)[0], roc_curve(y_test, y_pred_proba_svm)[1])))
 
@@ -309,15 +315,15 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
     y_pred = model.predict(X_te)
     y_pred_proba = model.predict_proba(X_te)[:, 1]
     accuracy = accuracy_score(y_test, y_pred)
-    st.write(f"**Precisión (SVM con {name}):** {accuracy:.2f}")
-    st.write(f"**Matriz de Confusión (SVM con {name}):**")
+    st.write(f"*Precisión (SVM con {name}):* {accuracy:.2f}")
+    st.write(f"*Matriz de Confusión (SVM con {name}):*")
     st.write(confusion_matrix(y_test, y_pred))
-    st.write(f"**Informe de Clasificación (SVM con {name}):**")
+    st.write(f"*Informe de Clasificación (SVM con {name}):*")
     st.write(classification_report(y_test, y_pred))
     plot_roc_curve(y_test, y_pred_proba, f'Curva ROC - SVM ({name})')
 
     st.write(f"""
-    **Conclusión:**
+    *Conclusión:*
     El modelo SVM con {name} logra una precisión del {accuracy:.2f}. La curva ROC con un AUC de {auc(roc_curve(y_test, y_pred_proba)[0], roc_curve(y_test, y_pred_proba)[1]):.2f}.
     """)
 
@@ -341,10 +347,10 @@ history = nn_model.fit(X_train, y_train, epochs=hyperparams['epochs'], batch_siz
 y_pred_nn = (nn_model.predict(X_test) > 0.5).astype(int)
 y_pred_proba_nn = nn_model.predict(X_test).flatten()
 accuracy_nn = accuracy_score(y_test, y_pred_nn)
-st.write(f"**Precisión (Red Neuronal):** {accuracy_nn:.2f}")
-st.write("**Matriz de Confusión (Red Neuronal):**")
+st.write(f"*Precisión (Red Neuronal):* {accuracy_nn:.2f}")
+st.write("*Matriz de Confusión (Red Neuronal):*")
 st.write(confusion_matrix(y_test, y_pred_nn))
-st.write("**Informe de Clasificación (Red Neuronal):**")
+st.write("*Informe de Clasificación (Red Neuronal):*")
 st.write(classification_report(y_test, y_pred_nn))
 plot_roc_curve(y_test, y_pred_proba_nn, 'Curva ROC - Red Neuronal')
 
@@ -366,7 +372,7 @@ ax[1].legend()
 st.pyplot(fig)
 
 st.write("""
-**Conclusión:**
+*Conclusión:*
 La red neuronal con datos originales logra una precisión del {:.2f}. La curva de aprendizaje muestra que el modelo converge adecuadamente, sin signos de sobreajuste. La curva ROC con un AUC de {:.2f} confirma un buen rendimiento en la clasificación.
 """.format(accuracy_nn, auc(roc_curve(y_test, y_pred_proba_nn)[0], roc_curve(y_test, y_pred_proba_nn)[1])))
 
@@ -378,10 +384,10 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
     y_pred_nn = (nn_model.predict(X_te) > 0.5).astype(int)
     y_pred_proba_nn = nn_model.predict(X_te).flatten()
     accuracy_nn = accuracy_score(y_test, y_pred_nn)
-    st.write(f"**Precisión (Red Neuronal con {name}):** {accuracy_nn:.2f}")
-    st.write(f"**Matriz de Confusión (Red Neuronal con {name}):**")
+    st.write(f"*Precisión (Red Neuronal con {name}):* {accuracy_nn:.2f}")
+    st.write(f"*Matriz de Confusión (Red Neuronal con {name}):*")
     st.write(confusion_matrix(y_test, y_pred_nn))
-    st.write(f"**Informe de Clasificación (Red Neuronal con {name}):**")
+    st.write(f"*Informe de Clasificación (Red Neuronal con {name}):*")
     st.write(classification_report(y_test, y_pred_nn))
     plot_roc_curve(y_test, y_pred_proba_nn, f'Curva ROC - Red Neuronal ({name})')
 
@@ -403,7 +409,7 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
     st.pyplot(fig)
 
     st.write(f"""
-    **Conclusión:**
+    *Conclusión:*
     La red neuronal con {name} logra una precisión del {accuracy_nn:.2f}. La curva ROC con un AUC de {auc(roc_curve(y_test, y_pred_proba_nn)[0], roc_curve(y_test, y_pred_proba_nn)[1]):.2f}.
     """)
 
@@ -527,20 +533,20 @@ La siguiente base de datos pertenece a una población de indígenas Xavantes de 
 la cual cuenta con variables importantes para determinar enfermedades cardiovasculares en la población.  
 La base de datos incluye las siguientes variables:
 
-- **Sexo**: Género de los individuos (hombre o mujer).
-- **Edad**: Edad en años.
-- **Leptina**: Nivel de leptina, una hormona relacionada con la regulación del apetito y el metabolismo.
-- **Grasa**: Porcentaje de grasa corporal.
-- **IMC**: Índice de Masa Corporal, una medida de la relación entre peso y altura.
-- **BAI**: Índice de Adiposidad Corporal, una medida alternativa al IMC.
-- **Cintura**: Circunferencia de la cintura en centímetros.
-- **Cadera**: Circunferencia de la cadera en centímetros.
-- **CVLDL**: Colesterol de lipoproteínas de muy baja densidad.
-- **Triglic**: Nivel de triglicéridos en sangre.
-- **CTOTAL**: Colesterol total.
-- **CLDL**: Colesterol de lipoproteínas de baja densidad (colesterol "malo").
-- **CHDL**: Colesterol de lipoproteínas de alta densidad (colesterol "bueno").
-- **FTO_Aditivo**: Variante genética asociada con la obesidad y el riesgo cardiovascular.
+- *Sexo*: Género de los individuos (hombre o mujer).
+- *Edad*: Edad en años.
+- *Leptina*: Nivel de leptina, una hormona relacionada con la regulación del apetito y el metabolismo.
+- *Grasa*: Porcentaje de grasa corporal.
+- *IMC*: Índice de Masa Corporal, una medida de la relación entre peso y altura.
+- *BAI*: Índice de Adiposidad Corporal, una medida alternativa al IMC.
+- *Cintura*: Circunferencia de la cintura en centímetros.
+- *Cadera*: Circunferencia de la cadera en centímetros.
+- *CVLDL*: Colesterol de lipoproteínas de muy baja densidad.
+- *Triglic*: Nivel de triglicéridos en sangre.
+- *CTOTAL*: Colesterol total.
+- *CLDL*: Colesterol de lipoproteínas de baja densidad (colesterol "malo").
+- *CHDL*: Colesterol de lipoproteínas de alta densidad (colesterol "bueno").
+- *FTO_Aditivo*: Variante genética asociada con la obesidad y el riesgo cardiovascular.
 """)
 
 st.write("### Vista previa de los datos")
@@ -554,24 +560,24 @@ st.write(data.describe())
 st.write("""
 ### Variable Objetivo: Riesgo Cardiovascular
 
-La variable objetivo de este estudio es el **Riesgo Cardiovascular**, que se determina en función de los siguientes criterios clínicos y umbrales establecidos:
+La variable objetivo de este estudio es el *Riesgo Cardiovascular*, que se determina en función de los siguientes criterios clínicos y umbrales establecidos:
 
-- **Colesterol Total (CTOTAL)**: Alto riesgo si **CTOTAL > 200 mg/dL**.
-- **Triglicéridos (Triglic)**: Alto riesgo si **Triglic > 150 mg/dL**.
-- **Colesterol LDL (CLDL)**: Alto riesgo si **CLDL > 130 mg/dL**.
-- **Colesterol HDL (CHDL)**: **Bajo riesgo** si **CHDL < 40 mg/dL (hombres)** o **< 50 mg/dL (mujeres)**.
-- **Índice de Masa Corporal (IMC)**: Alto riesgo si **IMC > 30** (obesidad).
-- **Circunferencia de Cintura**: Alto riesgo si **Cintura > 102 cm (hombres)** o **> 88 cm (mujeres)**.
-- **Relación Cintura-Cadera**: Alto riesgo si **Relación > 0.9 (hombres)** o **> 0.85 (mujeres)**.
+- *Colesterol Total (CTOTAL): Alto riesgo si **CTOTAL > 200 mg/dL*.
+- *Triglicéridos (Triglic): Alto riesgo si **Triglic > 150 mg/dL*.
+- *Colesterol LDL (CLDL): Alto riesgo si **CLDL > 130 mg/dL*.
+- *Colesterol HDL (CHDL): **Bajo riesgo* si *CHDL < 40 mg/dL (hombres)* o *< 50 mg/dL (mujeres)*.
+- *Índice de Masa Corporal (IMC): Alto riesgo si **IMC > 30* (obesidad).
+- *Circunferencia de Cintura: Alto riesgo si **Cintura > 102 cm (hombres)* o *> 88 cm (mujeres)*.
+- *Relación Cintura-Cadera: Alto riesgo si **Relación > 0.9 (hombres)* o *> 0.85 (mujeres)*.
 
 #### Definición de la Variable de Interés:
-- **0 (Bajo riesgo):** El individuo **no cumple con ninguno** de los criterios de alto riesgo.
-- **1 (Alto riesgo):** El individuo **cumple con al menos uno** de los criterios de alto riesgo mencionados anteriormente.
+- *0 (Bajo riesgo):* El individuo *no cumple con ninguno* de los criterios de alto riesgo.
+- *1 (Alto riesgo):* El individuo *cumple con al menos uno* de los criterios de alto riesgo mencionados anteriormente.
 
 Esta variable se calcula automáticamente en el análisis utilizando los umbrales clínicos establecidos.
 """)
 
-st.write(f"Se ha utilizado un umbral de **{umbral:.2f}** basado en el 50% del valor máximo del índice.")
+st.write(f"Se ha utilizado un umbral de *{umbral:.2f}* basado en el 50% del valor máximo del índice.")
 
 # Mostrar el balance de clases
 st.write("#### Balance de Clases en la Variable Objetivo")
@@ -702,15 +708,15 @@ svm_model.fit(X_train, y_train)
 y_pred_svm = svm_model.predict(X_test)
 y_pred_proba_svm = svm_model.predict_proba(X_test)[:, 1]
 accuracy_svm = accuracy_score(y_test, y_pred_svm)
-st.write(f"**Precisión (SVM):** {accuracy_svm:.2f}")
-st.write("**Matriz de Confusión (SVM):**")
+st.write(f"*Precisión (SVM):* {accuracy_svm:.2f}")
+st.write("*Matriz de Confusión (SVM):*")
 st.write(confusion_matrix(y_test, y_pred_svm))
-st.write("**Informe de Clasificación (SVM):**")
+st.write("*Informe de Clasificación (SVM):*")
 st.write(classification_report(y_test, y_pred_svm))
 plot_roc_curve(y_test, y_pred_proba_svm, 'Curva ROC - SVM (Datos Originales)')
 
 st.write("""
-**Conclusión:**
+*Conclusión:*
 El modelo SVM con datos originales logra una precisión del {:.2f}. La matriz de confusión muestra un buen equilibrio entre verdaderos positivos y falsos positivos. La curva ROC con un AUC de {:.2f} indica un buen rendimiento en la clasificación.
 """.format(accuracy_svm, auc(roc_curve(y_test, y_pred_proba_svm)[0], roc_curve(y_test, y_pred_proba_svm)[1])))
 
@@ -726,15 +732,15 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
     y_pred = model.predict(X_te)
     y_pred_proba = model.predict_proba(X_te)[:, 1]
     accuracy = accuracy_score(y_test, y_pred)
-    st.write(f"**Precisión (SVM con {name}):** {accuracy:.2f}")
-    st.write(f"**Matriz de Confusión (SVM con {name}):**")
+    st.write(f"*Precisión (SVM con {name}):* {accuracy:.2f}")
+    st.write(f"*Matriz de Confusión (SVM con {name}):*")
     st.write(confusion_matrix(y_test, y_pred))
-    st.write(f"**Informe de Clasificación (SVM con {name}):**")
+    st.write(f"*Informe de Clasificación (SVM con {name}):*")
     st.write(classification_report(y_test, y_pred))
     plot_roc_curve(y_test, y_pred_proba, f'Curva ROC - SVM ({name})')
 
     st.write(f"""
-    **Conclusión:**
+    *Conclusión:*
     El modelo SVM con {name} logra una precisión del {accuracy:.2f}. La curva ROC con un AUC de {auc(roc_curve(y_test, y_pred_proba)[0], roc_curve(y_test, y_pred_proba)[1]):.2f}.
     """)
 
@@ -758,10 +764,10 @@ history = nn_model.fit(X_train, y_train, epochs=hyperparams['epochs'], batch_siz
 y_pred_nn = (nn_model.predict(X_test) > 0.5).astype(int)
 y_pred_proba_nn = nn_model.predict(X_test).flatten()
 accuracy_nn = accuracy_score(y_test, y_pred_nn)
-st.write(f"**Precisión (Red Neuronal):** {accuracy_nn:.2f}")
-st.write("**Matriz de Confusión (Red Neuronal):**")
+st.write(f"*Precisión (Red Neuronal):* {accuracy_nn:.2f}")
+st.write("*Matriz de Confusión (Red Neuronal):*")
 st.write(confusion_matrix(y_test, y_pred_nn))
-st.write("**Informe de Clasificación (Red Neuronal):**")
+st.write("*Informe de Clasificación (Red Neuronal):*")
 st.write(classification_report(y_test, y_pred_nn))
 plot_roc_curve(y_test, y_pred_proba_nn, 'Curva ROC - Red Neuronal')
 
@@ -783,7 +789,7 @@ ax[1].legend()
 st.pyplot(fig)
 
 st.write("""
-**Conclusión:**
+*Conclusión:*
 La red neuronal con datos originales logra una precisión del {:.2f}. La curva de aprendizaje muestra que el modelo converge adecuadamente, sin signos de sobreajuste. La curva ROC con un AUC de {:.2f} confirma un buen rendimiento en la clasificación.
 """.format(accuracy_nn, auc(roc_curve(y_test, y_pred_proba_nn)[0], roc_curve(y_test, y_pred_proba_nn)[1])))
 
@@ -795,10 +801,10 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
     y_pred_nn = (nn_model.predict(X_te) > 0.5).astype(int)
     y_pred_proba_nn = nn_model.predict(X_te).flatten()
     accuracy_nn = accuracy_score(y_test, y_pred_nn)
-    st.write(f"**Precisión (Red Neuronal con {name}):** {accuracy_nn:.2f}")
-    st.write(f"**Matriz de Confusión (Red Neuronal con {name}):**")
+    st.write(f"*Precisión (Red Neuronal con {name}):* {accuracy_nn:.2f}")
+    st.write(f"*Matriz de Confusión (Red Neuronal con {name}):*")
     st.write(confusion_matrix(y_test, y_pred_nn))
-    st.write(f"**Informe de Clasificación (Red Neuronal con {name}):**")
+    st.write(f"*Informe de Clasificación (Red Neuronal con {name}):*")
     st.write(classification_report(y_test, y_pred_nn))
     plot_roc_curve(y_test, y_pred_proba_nn, f'Curva ROC - Red Neuronal ({name})')
 
@@ -820,95 +826,9 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
     st.pyplot(fig)
 
     st.write(f"""
-    **Conclusión:**
+    *Conclusión:*
     La red neuronal con {name} logra una precisión del {accuracy_nn:.2f}. La curva ROC con un AUC de {auc(roc_curve(y_test, y_pred_proba_nn)[0], roc_curve(y_test, y_pred_proba_nn)[1]):.2f}.
     """)
 
 ####################################################
 
-
-st.title("Predicción de Riesgo Cardiovascular")
-
-# Cargar modelo desde archivo comprimido
-@st.cache_resource
-def load_model():
-    """Carga el modelo y el scaler desde un archivo comprimido."""
-    try:
-        with gzip.open("modelo_entrenado.pkl.gz", "rb") as f:
-            data = pickle.load(f)
-
-        if isinstance(data, dict) and "modelo" in data and "scaler" in data:
-            return data["modelo"], data["scaler"]
-        else:
-            raise ValueError("El archivo no tiene el formato esperado.")
-    except Exception as e:
-        st.error(f"Error al cargar el modelo: {e}")
-        return None, None
-
-# Cargar modelo y scaler
-model, scaler = load_model()
-
-# Función para ingresar datos del usuario
-def user_input():
-    st.header("📋 Ingresar Datos del Paciente")
-
-    # Variables categóricas
-    sexo = st.selectbox("Sexo", ["Femenino", "Masculino"], index=1)
-    fto_aditivo = st.selectbox("FTO Aditivo", [0, 1], index=0)
-
-    # Variables numéricas con validación de rango
-    edad = st.number_input("Edad", min_value=18, max_value=100, value=60, step=1)
-    leptina = st.number_input("Leptina (ng/mL)", min_value=0.0, max_value=100.0, value=30.0, step=0.1)
-    grasa = st.number_input("Grasa Corporal (%)", min_value=0.0, max_value=100.0, value=35.0, step=0.1)
-    imc = st.number_input("Índice de Masa Corporal (IMC)", min_value=10.0, max_value=50.0, value=32.0, step=0.1)
-    bai = st.number_input("Índice de Adiposidad Corporal (BAI)", min_value=0.0, max_value=50.0, value=30.0, step=0.1)
-    cintura = st.number_input("Circunferencia de Cintura (cm)", min_value=30.0, max_value=200.0, value=110.0, step=0.1)
-    cadera = st.number_input("Circunferencia de Cadera (cm)", min_value=30.0, max_value=200.0, value=120.0, step=0.1)
-    cvldl = st.number_input("Colesterol VLDL (mg/dL)", min_value=0.0, max_value=200.0, value=50.0, step=0.1)
-    triglic = st.number_input("Triglicéridos (mg/dL)", min_value=0.0, max_value=500.0, value=250.0, step=0.1)
-    ctotal = st.number_input("Colesterol Total (mg/dL)", min_value=0.0, max_value=400.0, value=280.0, step=0.1)
-    cldl = st.number_input("Colesterol LDL (mg/dL)", min_value=0.0, max_value=300.0, value=180.0, step=0.1)
-    chdl = st.number_input("Colesterol HDL (mg/dL)", min_value=0.0, max_value=100.0, value=35.0, step=0.1)
-
-    # Convertir sexo a variable binaria (0 = Femenino, 1 = Masculino)
-    sexo_binario = 1 if sexo == "Masculino" else 0
-
-    # Crear un array con los datos ingresados
-    data = np.array([[sexo_binario, edad, leptina, grasa, imc, bai, cintura, cadera, 
-                      cvldl, triglic, ctotal, cldl, chdl, fto_aditivo]], dtype=np.float32)
-    return data
-
-# Obtener datos del usuario
-input_data = user_input()
-
-# Botón para hacer la predicción
-if st.button(" Realizar Predicción"):
-    if model is not None and scaler is not None:
-        try:
-            # Verificar dimensiones esperadas por el scaler
-            expected_features = scaler.n_features_in_
-            actual_features = input_data.shape[1]
-            if actual_features != expected_features:
-                st.error(f"⚠️ Error: El modelo espera {expected_features} características, pero se proporcionaron {actual_features}.")
-            else:
-                # Escalar todas las características correctamente
-                input_data_scaled = scaler.transform(input_data)
-
-                # Realizar la predicción
-                prediction = model.predict(input_data_scaled)
-
-                # Manejo seguro de la salida
-                prediction_value = float(prediction[0]) if isinstance(prediction, np.ndarray) else float(prediction)
-
-                # Clasificar el riesgo
-                prediction_label = "🟢 Bajo Riesgo" if prediction_value >= 0.5 else "🔴 Alto Riesgo"
-
-                # Mostrar resultados
-                st.subheader("📌 Resultado de la Predicción:")
-                st.markdown(f"## {prediction_label}")
-               
-
-        except Exception as e:
-            st.error(f"⚠️ Error en la predicción: {e}")
-    else:
-        st.error("⚠️ No se pudo cargar el modelo y/o el scaler.")
