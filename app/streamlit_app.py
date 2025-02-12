@@ -415,8 +415,7 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
 
 ####################################################
 
-
-   # Sección de predicción con datos predefinidos
+# Sección de predicción con datos predefinidos
     st.subheader("Predicción de riesgo cardiovascular")
     
     datos_predeterminados = {
@@ -436,8 +435,11 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
         # Convertir inputs a DataFrame y asegurarse de que tenga las mismas columnas esperadas
         X_nuevo = pd.DataFrame([inputs])  
         
-        # Reordenar las columnas para que coincidan con las del scaler
-        X_nuevo = X_nuevo.reindex(columns=scaler_cargado.feature_names_in_, fill_value=0)
+        # Asegurar que X_nuevo tenga las mismas columnas y orden que el scaler
+        columnas_faltantes = [col for col in scaler_cargado.feature_names_in_ if col not in X_nuevo.columns]
+        for col in columnas_faltantes:
+            X_nuevo[col] = 0  # Rellenar con ceros si falta alguna columna
+        X_nuevo = X_nuevo[scaler_cargado.feature_names_in_]
         
         # Mostrar debug
         st.write("📌 Características esperadas por el scaler:", scaler_cargado.feature_names_in_)
@@ -445,9 +447,12 @@ for name, X_tr, X_te in [('PCA', X_train_pca, X_test_pca), ('t-SNE', X_train_tsn
         st.write("📌 Shape de los datos antes de escalar:", X_nuevo.shape)
         
         # Transformar con el scaler
-        X_nuevo = scaler_cargado.transform(X_nuevo)
-        
-        # Realizar la predicción
-        prediccion = modelo_cargado.predict(X_nuevo)[0][0]
-        riesgo = "Alto" if prediccion > 0.5 else "Bajo"
-        st.write(f"Riesgo cardiovascular: {riesgo} (Probabilidad: {prediccion:.2f})")
+        try:
+            X_nuevo = scaler_cargado.transform(X_nuevo)
+            # Realizar la predicción
+            prediccion = modelo_cargado.predict(X_nuevo)[0][0]
+            riesgo = "Alto" if prediccion > 0.5 else "Bajo"
+            st.write(f"Riesgo cardiovascular: {riesgo} (Probabilidad: {prediccion:.2f})")
+        except ValueError as e:
+            st.error(f"Error en la transformación de los datos: {e}")
+
