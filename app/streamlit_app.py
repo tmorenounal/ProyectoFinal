@@ -27,9 +27,8 @@ st.sidebar.markdown("---")
 with st.sidebar.expander(" Análisis de Datos", expanded=True):
     section_analisis = st.radio(
         "Selecciona una sección:",
-        [
-            "Análisis Exploratorio",
-        ],
+        ["Análisis Exploratorio"],
+        key="analisis_radio"  # Key único
     )
 
 # Submenú para Modelos de Machine Learning
@@ -44,15 +43,15 @@ with st.sidebar.expander(" Modelos Ajustados", expanded=True):
             "Red Neuronal con PCA",
             "Red Neuronal con t-SNE",
         ],
+        key="modelos_radio"  # Key único
     )
 
 # Submenú para Predicciones
 with st.sidebar.expander("Predicciones", expanded=True):
     section_predicciones = st.radio(
         "Selecciona una sección:",
-        [
-            "Predicción de Riesgo Cardiovascular",
-        ],
+        ["Predicción de Riesgo Cardiovascular"],
+        key="predicciones_radio"  # Key único
     )
 
 
@@ -89,8 +88,8 @@ if missing_columns:
 
 # Calcular el índice de riesgo cardiovascular
 data['Riesgo_Cardiovascular'] = data[list(pesos.keys())].mul(pesos).sum(axis=1)
-
 data['Riesgo_Cardiovascular_Binario'] = (data['Riesgo_Cardiovascular'] > data['Riesgo_Cardiovascular'].median()).astype(int)
+
 # Calcular el índice de riesgo cardiovascular
 data['Riesgo_Cardiovascular'] = sum(data[col] * peso for col, peso in pesos.items())
 
@@ -857,21 +856,22 @@ model, scaler = load_model()
 st.title("Clasificación de Riesgo Cardiovascular")
 
 # Entradas del usuario
+# Entradas del usuario
 st.sidebar.header("Ingrese los datos")
 
-edad = st.sidebar.number_input("Edad (años)", min_value=0, max_value=120, value=30)
-leptina = st.sidebar.number_input("Leptina (ng/mL)", min_value=0.0, value=10.0)
-grasa = st.sidebar.number_input("Grasa corporal (%)", min_value=0.0, value=25.0)
-imc = st.sidebar.number_input("IMC", min_value=0.0, value=22.0)
-bai = st.sidebar.number_input("BAI", min_value=0.0, value=30.0)
-cintura = st.sidebar.number_input("Cintura (cm)", min_value=0.0, value=80.0)
-cadera = st.sidebar.number_input("Cadera (cm)", min_value=0.0, value=100.0)
-cvlvl = st.sidebar.number_input("CVLDL (mg/dL)", min_value=0.0, value=10.0)
-triglic = st.sidebar.number_input("Triglicéridos (mg/dL)", min_value=0.0, value=150.0)
-ctotal = st.sidebar.number_input("Colesterol Total (mg/dL)", min_value=0.0, value=200.0)
-cldl = st.sidebar.number_input("CLDL (mg/dL)", min_value=0.0, value=100.0)
-chdl = st.sidebar.number_input("CHDL (mg/dL)", min_value=0.0, value=50.0)
-fto_aditivo = st.sidebar.number_input("FTO_Aditivo", min_value=0.0, value=1.0)
+edad = st.sidebar.number_input("Edad (años)", min_value=0, max_value=120, value=30, key="edad")
+leptina = st.sidebar.number_input("Leptina (ng/mL)", min_value=0.0, value=10.0, key="leptina")
+grasa = st.sidebar.number_input("Grasa corporal (%)", min_value=0.0, value=25.0, key="grasa")
+imc = st.sidebar.number_input("IMC", min_value=0.0, value=22.0, key="imc")
+bai = st.sidebar.number_input("BAI", min_value=0.0, value=30.0, key="bai")
+cintura = st.sidebar.number_input("Cintura (cm)", min_value=0.0, value=80.0, key="cintura")
+cadera = st.sidebar.number_input("Cadera (cm)", min_value=0.0, value=100.0, key="cadera")
+cvlvl = st.sidebar.number_input("CVLDL (mg/dL)", min_value=0.0, value=10.0, key="cvlvl")
+triglic = st.sidebar.number_input("Triglicéridos (mg/dL)", min_value=0.0, value=150.0, key="triglic")
+ctotal = st.sidebar.number_input("Colesterol Total (mg/dL)", min_value=0.0, value=200.0, key="ctotal")
+cldl = st.sidebar.number_input("CLDL (mg/dL)", min_value=0.0, value=100.0, key="cldl")
+chdl = st.sidebar.number_input("CHDL (mg/dL)", min_value=0.0, value=50.0, key="chdl")
+fto_aditivo = st.sidebar.number_input("FTO_Aditivo", min_value=0.0, value=1.0, key="fto_aditivo")
 
 # Crear un DataFrame con los datos ingresados
 data = {
