@@ -428,7 +428,7 @@ if st.button("Realizar Predicción"):
                 prediction = model.predict(input_data_scaled)
                 prediction_value = float(prediction[0]) if isinstance(prediction, np.ndarray) else float(prediction)
                 prediction_label = "🟢 Bajo Riesgo" if prediction_value >= 0.5 else "🔴 Alto Riesgo"
-                st.subheader("📌 Resultado de la Predicción:")
+                st.subheader(" Resultado de la Predicción:")
                 st.markdown(f"## {prediction_label}")
         except Exception as e:
             st.error(f"⚠ Error en la predicción: {e}")
